@@ -33,9 +33,11 @@ try:
         QTabWidget, QMessageBox, QFileDialog, QGroupBox, QGridLayout,
         QHeaderView, QStatusBar, QComboBox, QInputDialog, QFrame,
         QSizePolicy, QAbstractItemView, QCheckBox, QSpinBox, QDoubleSpinBox,
-        QDialog, QSystemTrayIcon, QMenu, QAction
+        QDialog, QSystemTrayIcon, QMenu, QAction, QCompleter, QTextEdit
     )
-    from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QSize, QEvent
+    from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QSize, QEvent, QStringListModel
+    from PyQt5.QtWidgets import QShortcut
+    from PyQt5.QtGui import QKeySequence
     from PyQt5.QtGui import QFont, QPixmap, QColor, QFontDatabase
 except ImportError:
     print("PyQt5 no encontrado. Ejecuta launch.bat para instalar las dependencias.")
@@ -368,7 +370,7 @@ QSpinBox::down-button, QDoubleSpinBox::down-button {{
 # Internationalisation
 # ─────────────────────────────────────────────────────────────────────────────
 
-__version__ = '1.2.0'
+__version__ = '1.4.0'
 
 _LANG = 'en'
 _LANGS = [('en', 'English'), ('es', 'Español'), ('ru', 'Русский'), ('zh', '中文')]
@@ -504,6 +506,35 @@ TRANSLATIONS: dict = {
         'coin_control_insufficient': 'Selected UTXOs insufficient.\nSelected: {selected:.8f}\nNeeded: ~{needed:.8f} BTQ',
         'dlg_coin_control_send': 'Send {amount:.8f} BTQ to:\n{addr}\n\nInputs:  {selected:.8f} BTQ\nFee:     {fee:.8f} BTQ\nChange:  {change:.8f} BTQ',
         'settings_saved': 'Settings saved',
+        # Address book
+        'tab_addressbook': 'BOOK',
+        'group_addressbook': 'ADDRESS BOOK',
+        'col_contact_name': 'NAME', 'col_contact_addr': 'ADDRESS',
+        'btn_add_contact': 'Add Contact',
+        'btn_delete_contact': 'Delete',
+        'dlg_contact_name': 'Contact name:',
+        'dlg_contact_addr': 'BTQ address:',
+        'dlg_contact_exists': 'Address already in address book.',
+        'contact_saved': 'Contact saved.',
+        'contact_deleted': 'Contact deleted.',
+        # Message signing
+        'tab_sign': 'SIGN',
+        'group_sign': 'SIGN MESSAGE',
+        'group_verify': 'VERIFY MESSAGE',
+        'lbl_sign_address': 'Address (from your wallet)',
+        'lbl_sign_message': 'Message',
+        'lbl_sign_result': 'Signature',
+        'btn_sign': 'Sign',
+        'btn_copy_sig': 'Copy Signature',
+        'lbl_verify_address': 'Address',
+        'lbl_verify_message': 'Message',
+        'lbl_verify_sig': 'Signature',
+        'btn_verify': 'Verify',
+        'verify_ok': '✓  Valid signature — message is authentic.',
+        'verify_fail': '✗  Invalid signature.',
+        'sign_done': 'Message signed.',
+        # Keyboard shortcuts hint
+        'shortcuts_hint': 'Shortcuts: Ctrl+1-7 tabs · Ctrl+L lock · F5 refresh',
         # Wallet encryption
         'group_wallet_enc': 'WALLET ENCRYPTION',
         'wallet_enc_unencrypted': 'Not encrypted — wallet.dat is stored in plaintext on disk.',
@@ -670,6 +701,20 @@ TRANSLATIONS: dict = {
         'coin_control_insufficient': 'UTXOs insuficientes.\nSeleccionado: {selected:.8f}\nNecesario: ~{needed:.8f} BTQ',
         'dlg_coin_control_send': 'Enviar {amount:.8f} BTQ a:\n{addr}\n\nEntradas: {selected:.8f} BTQ\nComisión: {fee:.8f} BTQ\nCambio:   {change:.8f} BTQ',
         'settings_saved': 'Configuración guardada',
+        'tab_addressbook': 'AGENDA', 'group_addressbook': 'AGENDA DE DIRECCIONES',
+        'col_contact_name': 'NOMBRE', 'col_contact_addr': 'DIRECCIÓN',
+        'btn_add_contact': 'Añadir Contacto', 'btn_delete_contact': 'Eliminar',
+        'dlg_contact_name': 'Nombre del contacto:', 'dlg_contact_addr': 'Dirección BTQ:',
+        'dlg_contact_exists': 'Dirección ya en la agenda.',
+        'contact_saved': 'Contacto guardado.', 'contact_deleted': 'Contacto eliminado.',
+        'tab_sign': 'FIRMAR', 'group_sign': 'FIRMAR MENSAJE', 'group_verify': 'VERIFICAR MENSAJE',
+        'lbl_sign_address': 'Dirección (de tu wallet)', 'lbl_sign_message': 'Mensaje',
+        'lbl_sign_result': 'Firma', 'btn_sign': 'Firmar', 'btn_copy_sig': 'Copiar Firma',
+        'lbl_verify_address': 'Dirección', 'lbl_verify_message': 'Mensaje',
+        'lbl_verify_sig': 'Firma', 'btn_verify': 'Verificar',
+        'verify_ok': '✓  Firma válida — mensaje auténtico.',
+        'verify_fail': '✗  Firma inválida.', 'sign_done': 'Mensaje firmado.',
+        'shortcuts_hint': 'Atajos: Ctrl+1-7 pestañas · Ctrl+L bloquear · F5 actualizar',
         'group_wallet_enc': 'CIFRADO DE WALLET',
         'wallet_enc_unencrypted': 'Sin cifrar — wallet.dat se guarda en texto plano en disco.',
         'wallet_enc_locked': 'Cifrada · bloqueada',
@@ -832,6 +877,20 @@ TRANSLATIONS: dict = {
         'coin_control_insufficient': 'Недостаточно UTXOs.\nВыбрано: {selected:.8f}\nНужно: ~{needed:.8f} BTQ',
         'dlg_coin_control_send': 'Отправить {amount:.8f} BTQ на:\n{addr}\n\nВходы:    {selected:.8f} BTQ\nКомиссия: {fee:.8f} BTQ\nСдача:    {change:.8f} BTQ',
         'settings_saved': 'Настройки сохранены',
+        'tab_addressbook': 'КОНТАКТЫ', 'group_addressbook': 'АДРЕСНАЯ КНИГА',
+        'col_contact_name': 'ИМЯ', 'col_contact_addr': 'АДРЕС',
+        'btn_add_contact': 'Добавить', 'btn_delete_contact': 'Удалить',
+        'dlg_contact_name': 'Имя контакта:', 'dlg_contact_addr': 'BTQ адрес:',
+        'dlg_contact_exists': 'Адрес уже в книге.',
+        'contact_saved': 'Контакт сохранён.', 'contact_deleted': 'Контакт удалён.',
+        'tab_sign': 'ПОДПИСЬ', 'group_sign': 'ПОДПИСАТЬ СООБЩЕНИЕ', 'group_verify': 'ПРОВЕРИТЬ ПОДПИСЬ',
+        'lbl_sign_address': 'Адрес (из вашего кошелька)', 'lbl_sign_message': 'Сообщение',
+        'lbl_sign_result': 'Подпись', 'btn_sign': 'Подписать', 'btn_copy_sig': 'Копировать',
+        'lbl_verify_address': 'Адрес', 'lbl_verify_message': 'Сообщение',
+        'lbl_verify_sig': 'Подпись', 'btn_verify': 'Проверить',
+        'verify_ok': '✓  Подпись действительна — сообщение подлинное.',
+        'verify_fail': '✗  Подпись недействительна.', 'sign_done': 'Сообщение подписано.',
+        'shortcuts_hint': 'Ярлыки: Ctrl+1-7 вкладки · Ctrl+L блокировка · F5 обновить',
         'group_wallet_enc': 'ШИФРОВАНИЕ КОШЕЛЬКА',
         'wallet_enc_unencrypted': 'Не зашифрован — wallet.dat хранится в открытом виде.',
         'wallet_enc_locked': 'Зашифрован · заблокирован',
@@ -994,6 +1053,20 @@ TRANSLATIONS: dict = {
         'coin_control_insufficient': 'UTXO不足。\n已选: {selected:.8f}\n需要: ~{needed:.8f} BTQ',
         'dlg_coin_control_send': '发送 {amount:.8f} BTQ 到:\n{addr}\n\n输入:  {selected:.8f} BTQ\n手续费: {fee:.8f} BTQ\n找零:  {change:.8f} BTQ',
         'settings_saved': '设置已保存',
+        'tab_addressbook': '地址簿', 'group_addressbook': '地址簿',
+        'col_contact_name': '名称', 'col_contact_addr': '地址',
+        'btn_add_contact': '添加联系人', 'btn_delete_contact': '删除',
+        'dlg_contact_name': '联系人名称：', 'dlg_contact_addr': 'BTQ地址：',
+        'dlg_contact_exists': '地址已在地址簿中。',
+        'contact_saved': '联系人已保存。', 'contact_deleted': '联系人已删除。',
+        'tab_sign': '签名', 'group_sign': '签署消息', 'group_verify': '验证消息',
+        'lbl_sign_address': '地址（来自您的钱包）', 'lbl_sign_message': '消息',
+        'lbl_sign_result': '签名', 'btn_sign': '签名', 'btn_copy_sig': '复制签名',
+        'lbl_verify_address': '地址', 'lbl_verify_message': '消息',
+        'lbl_verify_sig': '签名', 'btn_verify': '验证',
+        'verify_ok': '✓  签名有效 — 消息真实。',
+        'verify_fail': '✗  签名无效。', 'sign_done': '消息已签名。',
+        'shortcuts_hint': '快捷键: Ctrl+1-7切换标签 · Ctrl+L锁定 · F5刷新',
         'group_wallet_enc': '钱包加密',
         'wallet_enc_unencrypted': '未加密 — wallet.dat 以明文存储在磁盘上。',
         'wallet_enc_locked': '已加密 · 已锁定',
@@ -1049,6 +1122,7 @@ def _load_app_settings() -> dict:
         'use_tor': False, 'tor_proxy': '127.0.0.1:9050',
         'use_i2p': False, 'i2p_sam': '127.0.0.1:7656',
         'warn_no_privacy': True,
+        'address_book': {},   # {address: name}
     }
     try:
         with open(_SETTINGS_PATH, encoding='utf-8') as f:
@@ -1292,6 +1366,12 @@ class BTQRPCClient:
     def wallet_passphrase_change(self, old: str, new: str):
         return self.call('walletpassphrasechange', old, new)
 
+    def sign_message(self, address: str, message: str) -> str:
+        return self.call('signmessage', address, message)
+
+    def verify_message(self, address: str, signature: str, message: str) -> bool:
+        return bool(self.call('verifymessage', address, signature, message))
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Worker RPC (hilo separado para no bloquear la GUI)
@@ -1461,6 +1541,7 @@ class WalletGUI(QMainWindow):
         self._build_ui()
         self._setup_timer()
         self._setup_tray()
+        self._setup_shortcuts()
         QTimer.singleShot(3000, self._check_for_update)
         # Install event filter on the application to track user activity for idle lock
         QApplication.instance().installEventFilter(self)
@@ -1515,13 +1596,14 @@ class WalletGUI(QMainWindow):
         self._tab_send()
         self._tab_transactions()
         self._tab_network()
+        self._tab_sign()
         self._tab_settings()
 
         sb = QStatusBar()
         sb.setSizeGripEnabled(False)
         self.setStatusBar(sb)
         self._status_bar = sb
-        self._set_status('Iniciando...')
+        self._set_status(t('shortcuts_hint'))
 
         # Lock overlay — child of root, not part of any layout
         self._lock_overlay = self._build_lock_overlay(root)
@@ -1951,6 +2033,39 @@ class WalletGUI(QMainWindow):
         v.addWidget(cc_box)
         v.addSpacing(8)
 
+        # ── Address book ──────────────────────────────────────────────────
+        ab_box = QGroupBox(t('group_addressbook'))
+        abv = QVBoxLayout(ab_box)
+        abv.setSpacing(6)
+
+        self._ab_table = QTableWidget()
+        self._ab_table.setColumnCount(2)
+        self._ab_table.setHorizontalHeaderLabels([t('col_contact_name'), t('col_contact_addr')])
+        self._ab_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self._ab_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self._ab_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self._ab_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self._ab_table.setSelectionMode(QAbstractItemView.SingleSelection)
+        self._ab_table.setAlternatingRowColors(True)
+        self._ab_table.verticalHeader().setVisible(False)
+        self._ab_table.setMaximumHeight(120)
+        self._ab_table.doubleClicked.connect(self._ab_fill_send)
+        abv.addWidget(self._ab_table)
+
+        ab_toolbar = QHBoxLayout()
+        btn_add_contact = _btn(t('btn_add_contact'))
+        btn_del_contact = _btn(t('btn_delete_contact'), obj_name='danger')
+        btn_add_contact.clicked.connect(self._ab_add_contact)
+        btn_del_contact.clicked.connect(self._ab_delete_contact)
+        ab_toolbar.addWidget(btn_add_contact)
+        ab_toolbar.addWidget(btn_del_contact)
+        ab_toolbar.addStretch()
+        abv.addLayout(ab_toolbar)
+        v.addWidget(ab_box)
+        v.addSpacing(8)
+        self._ab_refresh_table()
+        self._ab_setup_completer()
+
         btn_send = _btn(t('btn_send_tx'), obj_name='primary')
         btn_send.setMinimumHeight(42)
         btn_send.clicked.connect(self._send_tx)
@@ -2052,6 +2167,89 @@ class WalletGUI(QMainWindow):
         row_layout.addLayout(right)
         v.addLayout(row_layout)
         self.tabs.addTab(w, t('tab_network'))
+
+    # ──────────────────────────── Tab: Sign / Verify ──────────────────────
+
+    def _tab_sign(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+        v.setContentsMargins(20, 16, 20, 16)
+        v.setSpacing(12)
+
+        # ── Sign ──────────────────────────────────────────────────────────
+        sign_box = QGroupBox(t('group_sign'))
+        sg = QGridLayout(sign_box)
+        sg.setColumnStretch(1, 1)
+        sg.setSpacing(8)
+
+        sg.addWidget(_lbl(t('lbl_sign_address'), color=G['text_muted'], size=11), 0, 0)
+        self._sign_addr = QComboBox()
+        self._sign_addr.setEditable(True)
+        sg.addWidget(self._sign_addr, 0, 1)
+
+        sg.addWidget(_lbl(t('lbl_sign_message'), color=G['text_muted'], size=11), 1, 0)
+        self._sign_msg = QTextEdit()
+        self._sign_msg.setFixedHeight(72)
+        self._sign_msg.setPlaceholderText('Enter the message to sign…')
+        sg.addWidget(self._sign_msg, 1, 1)
+
+        sg.addWidget(_lbl(t('lbl_sign_result'), color=G['text_muted'], size=11), 2, 0)
+        self._sign_result = QLineEdit()
+        self._sign_result.setReadOnly(True)
+        self._sign_result.setFont(QFont('Consolas', 9))
+        self._sign_result.setPlaceholderText('Signature will appear here…')
+        sg.addWidget(self._sign_result, 2, 1)
+
+        sign_btn_row = QHBoxLayout()
+        btn_sign     = _btn(t('btn_sign'), obj_name='primary')
+        btn_copy_sig = _btn(t('btn_copy_sig'))
+        btn_sign.clicked.connect(self._sign_message)
+        btn_copy_sig.clicked.connect(lambda: self._copy_to_clipboard(self._sign_result.text()))
+        sign_btn_row.addWidget(btn_sign)
+        sign_btn_row.addWidget(btn_copy_sig)
+        sign_btn_row.addStretch()
+        sg.addLayout(sign_btn_row, 3, 0, 1, 2)
+        v.addWidget(sign_box)
+
+        # ── Verify ────────────────────────────────────────────────────────
+        verify_box = QGroupBox(t('group_verify'))
+        vg = QGridLayout(verify_box)
+        vg.setColumnStretch(1, 1)
+        vg.setSpacing(8)
+
+        vg.addWidget(_lbl(t('lbl_verify_address'), color=G['text_muted'], size=11), 0, 0)
+        self._verify_addr = QLineEdit()
+        self._verify_addr.setPlaceholderText('BTQ address…')
+        vg.addWidget(self._verify_addr, 0, 1)
+
+        vg.addWidget(_lbl(t('lbl_verify_message'), color=G['text_muted'], size=11), 1, 0)
+        self._verify_msg = QTextEdit()
+        self._verify_msg.setFixedHeight(72)
+        self._verify_msg.setPlaceholderText('Original message…')
+        vg.addWidget(self._verify_msg, 1, 1)
+
+        vg.addWidget(_lbl(t('lbl_verify_sig'), color=G['text_muted'], size=11), 2, 0)
+        self._verify_sig = QLineEdit()
+        self._verify_sig.setPlaceholderText('Base64 signature…')
+        self._verify_sig.setFont(QFont('Consolas', 9))
+        vg.addWidget(self._verify_sig, 2, 1)
+
+        self._verify_result_lbl = QLabel('')
+        self._verify_result_lbl.setWordWrap(True)
+        self._verify_result_lbl.setStyleSheet(
+            f'font-size: 12px; font-weight: bold; padding: 6px 10px; border-radius: 3px;')
+        self._verify_result_lbl.hide()
+        vg.addWidget(self._verify_result_lbl, 3, 0, 1, 2)
+
+        btn_verify = _btn(t('btn_verify'), obj_name='primary')
+        btn_verify.clicked.connect(self._verify_message)
+        verify_btn_row = QHBoxLayout()
+        verify_btn_row.addWidget(btn_verify)
+        verify_btn_row.addStretch()
+        vg.addLayout(verify_btn_row, 4, 0, 1, 2)
+        v.addWidget(verify_box)
+        v.addStretch()
+        self.tabs.addTab(w, t('tab_sign'))
 
     # ──────────────────────────── Tab: Configuración ──────────────────────
 
@@ -2366,7 +2564,7 @@ class WalletGUI(QMainWindow):
             self._connect(silent=True)
         else:
             self._set_status(t('status_no_config'))
-            self.tabs.setCurrentIndex(6)
+            self.tabs.setCurrentIndex(7)
 
     def _autodetect(self):
         settings, path = auto_detect_rpc()
@@ -2718,6 +2916,8 @@ class WalletGUI(QMainWindow):
         if self._recv_combo.currentText():
             self._refresh_qr(self._recv_combo.currentText())
 
+        self._refresh_sign_addresses()
+
     def _update_transactions(self, txs: list):
         # Collect all addresses ever used in transactions for reuse detection
         for tx in txs:
@@ -2800,7 +3000,7 @@ class WalletGUI(QMainWindow):
     def _require_conn(self) -> bool:
         if not self._connected:
             QMessageBox.warning(self, 'BTQ', t('dlg_no_conn'))
-            self.tabs.setCurrentIndex(6)
+            self.tabs.setCurrentIndex(7)
             return False
         return True
 
@@ -3619,6 +3819,143 @@ class WalletGUI(QMainWindow):
                 pass
         return 0.0001
 
+    # ──────────────────────────── Keyboard shortcuts ──────────────────────
+
+    def _setup_shortcuts(self):
+        tab_keys = ['1', '2', '3', '4', '5', '6', '7', '8']
+        for i, k in enumerate(tab_keys):
+            sc = QShortcut(QKeySequence(f'Ctrl+{k}'), self)
+            idx = i
+            sc.activated.connect(lambda n=idx: self.tabs.setCurrentIndex(n)
+                                 if n < self.tabs.count() else None)
+        QShortcut(QKeySequence('Ctrl+L'), self).activated.connect(self._lock)
+        QShortcut(QKeySequence('F5'),     self).activated.connect(self._auto_refresh)
+
+    # ──────────────────────────── Address book ────────────────────────────
+
+    def _ab_refresh_table(self):
+        if not hasattr(self, '_ab_table'):
+            return
+        book = self._app_settings.get('address_book', {})
+        self._ab_table.setRowCount(len(book))
+        for row, (addr, name) in enumerate(book.items()):
+            self._ab_table.setItem(row, 0, QTableWidgetItem(name))
+            item = QTableWidgetItem(addr)
+            item.setFont(QFont('Consolas', 9))
+            self._ab_table.setItem(row, 1, item)
+        self._ab_setup_completer()
+
+    def _ab_setup_completer(self):
+        if not hasattr(self, '_to_addr'):
+            return
+        book = self._app_settings.get('address_book', {})
+        suggestions = [f'{name}  ({addr})' for addr, name in book.items()] + list(book.keys())
+        model = QStringListModel(suggestions)
+        completer = QCompleter(model, self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setFilterMode(Qt.MatchContains)
+        completer.activated.connect(self._ab_completer_selected)
+        self._to_addr.setCompleter(completer)
+        self._ab_completer = completer
+
+    def _ab_completer_selected(self, text: str):
+        addr = text.split('(')[-1].rstrip(')').strip() if '(' in text else text.strip()
+        self._to_addr.setText(addr)
+
+    def _ab_fill_send(self):
+        row = self._ab_table.currentRow()
+        if row < 0:
+            return
+        item = self._ab_table.item(row, 1)
+        if item and hasattr(self, '_to_addr'):
+            self._to_addr.setText(item.text())
+            self.tabs.setCurrentIndex(3)
+
+    def _ab_add_contact(self):
+        name, ok1 = QInputDialog.getText(self, t('btn_add_contact'), t('dlg_contact_name'))
+        if not ok1 or not name.strip():
+            return
+        addr, ok2 = QInputDialog.getText(self, t('btn_add_contact'), t('dlg_contact_addr'))
+        if not ok2 or not addr.strip():
+            return
+        addr = addr.strip()
+        book = self._app_settings.setdefault('address_book', {})
+        if addr in book:
+            QMessageBox.warning(self, t('btn_add_contact'), t('dlg_contact_exists'))
+            return
+        book[addr] = name.strip()
+        _save_app_settings(self._app_settings)
+        self._ab_refresh_table()
+        self._set_status(t('contact_saved'))
+
+    def _ab_delete_contact(self):
+        if not hasattr(self, '_ab_table'):
+            return
+        row = self._ab_table.currentRow()
+        if row < 0:
+            return
+        item = self._ab_table.item(row, 1)
+        if not item:
+            return
+        addr = item.text()
+        book = self._app_settings.get('address_book', {})
+        book.pop(addr, None)
+        _save_app_settings(self._app_settings)
+        self._ab_refresh_table()
+        self._set_status(t('contact_deleted'))
+
+    # ──────────────────────────── Sign / Verify ───────────────────────────
+
+    def _refresh_sign_addresses(self):
+        if not hasattr(self, '_sign_addr') or not self._connected:
+            return
+        addrs = list(self._addresses.keys()) if self._addresses else []
+        self._sign_addr.clear()
+        self._sign_addr.addItems(addrs)
+
+    def _sign_message(self):
+        if not self._require_conn():
+            return
+        if not self._auto_unlock_for_send():
+            return
+        addr = self._sign_addr.currentText().strip()
+        msg  = self._sign_msg.toPlainText().strip()
+        if not addr or not msg:
+            return
+        try:
+            sig = self.rpc.sign_message(addr, msg)
+            self._sign_result.setText(sig)
+            self._set_status(t('sign_done'))
+        except (BTQRPCError, ConnectionError) as e:
+            QMessageBox.critical(self, 'BTQ', str(e))
+
+    def _verify_message(self):
+        addr = self._verify_addr.text().strip()
+        msg  = self._verify_msg.toPlainText().strip()
+        sig  = self._verify_sig.text().strip()
+        if not addr or not msg or not sig:
+            return
+        if not self._require_conn():
+            return
+        try:
+            ok = self.rpc.verify_message(addr, sig, msg)
+            lbl = self._verify_result_lbl
+            if ok:
+                lbl.setText(t('verify_ok'))
+                lbl.setStyleSheet(
+                    f'color: {G["green"]}; background: {G["green_dark"]}; '
+                    f'border: 1px solid {G["green_lo"]}; border-radius: 3px; '
+                    f'padding: 6px 10px; font-size: 12px; font-weight: bold;')
+            else:
+                lbl.setText(t('verify_fail'))
+                lbl.setStyleSheet(
+                    f'color: {G["red"]}; background: #1a0505; '
+                    f'border: 1px solid #3a0a0a; border-radius: 3px; '
+                    f'padding: 6px 10px; font-size: 12px; font-weight: bold;')
+            lbl.show()
+        except (BTQRPCError, ConnectionError) as e:
+            QMessageBox.critical(self, 'BTQ', str(e))
+
     # ──────────────────────────── Language & Privacy ──────────────────────
 
     def _on_lang_changed(self, index: int):
@@ -3657,6 +3994,7 @@ class WalletGUI(QMainWindow):
         self._tab_send()
         self._tab_transactions()
         self._tab_network()
+        self._tab_sign()
         self._tab_settings()
 
         # Restore fields
