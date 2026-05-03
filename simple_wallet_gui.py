@@ -3,7 +3,6 @@
 BTQ Wallet — Interfaz gráfica para Bitcoin Quantum
 Requiere nodo BTQ Core en ejecución.
 """
-
 import sys
 import os
 import json
@@ -19,12 +18,13 @@ import secrets
 import time
 import platform
 
-if sys.stdout.encoding != 'utf-8':
-    try:
+try:
+    if sys.stdout and sys.stdout.encoding != 'utf-8':
         sys.stdout.reconfigure(encoding='utf-8')
+    if sys.stderr and sys.stderr.encoding != 'utf-8':
         sys.stderr.reconfigure(encoding='utf-8')
-    except AttributeError:
-        pass
+except Exception:
+    pass
 
 try:
     from PyQt5.QtWidgets import (
@@ -38,7 +38,7 @@ try:
     from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QSize, QEvent, QStringListModel
     from PyQt5.QtWidgets import QShortcut
     from PyQt5.QtGui import QKeySequence
-    from PyQt5.QtGui import QFont, QPixmap, QColor, QFontDatabase
+    from PyQt5.QtGui import QFont, QPixmap, QColor, QFontDatabase, QIcon, QPainter, QPen
 except ImportError:
     print("PyQt5 no encontrado. Ejecuta launch.bat para instalar las dependencias.")
     sys.exit(1)
@@ -101,18 +101,15 @@ G = {
 
 STYLE = f"""
 /* ── Base ── */
-* {{
-    outline: none;
-}}
-QMainWindow, QDialog {{
-    background: {G['bg']};
-}}
+* {{ outline: none; }}
+QMainWindow, QDialog {{ background: {G['bg']}; }}
 QWidget {{
     background: {G['bg']};
     color: {G['text']};
     font-family: 'Consolas', 'Courier New', monospace;
     font-size: 12px;
 }}
+QLabel {{ background: transparent; }}
 
 /* ── Tabs ── */
 QTabWidget::pane {{
@@ -120,19 +117,18 @@ QTabWidget::pane {{
     background: {G['surface']};
     border-radius: 0 4px 4px 4px;
 }}
-QTabBar {{
-    background: transparent;
-}}
+QTabBar {{ background: transparent; }}
 QTabBar::tab {{
     background: {G['surface2']};
     color: {G['text_muted']};
     border: 1px solid {G['border2']};
     border-bottom: none;
-    padding: 7px 20px;
-    margin-right: 1px;
+    padding: 8px 18px;
+    margin-right: 2px;
     font-size: 11px;
     letter-spacing: 1px;
     text-transform: uppercase;
+    min-width: 70px;
 }}
 QTabBar::tab:selected {{
     background: {G['surface']};
@@ -144,6 +140,7 @@ QTabBar::tab:selected {{
 QTabBar::tab:hover:!selected {{
     color: {G['text']};
     background: {G['surface']};
+    border-color: {G['border']};
 }}
 
 /* ── GroupBox ── */
@@ -151,7 +148,7 @@ QGroupBox {{
     border: 1px solid {G['border']};
     border-radius: 4px;
     margin-top: 14px;
-    padding-top: 8px;
+    padding-top: 10px;
     background: {G['surface']};
     color: {G['text_muted']};
     font-size: 10px;
@@ -170,7 +167,7 @@ QLineEdit, QComboBox {{
     background: {G['surface2']};
     border: 1px solid {G['border']};
     border-radius: 3px;
-    padding: 7px 10px;
+    padding: 6px 10px;
     color: {G['text']};
     selection-background-color: {G['green_dark']};
     selection-color: {G['green_hi']};
@@ -179,13 +176,8 @@ QLineEdit:focus, QComboBox:focus {{
     border-color: {G['green']};
     background: #0a150a;
 }}
-QLineEdit::placeholder {{
-    color: {G['text_muted']};
-}}
-QComboBox::drop-down {{
-    border: none;
-    width: 20px;
-}}
+QLineEdit::placeholder {{ color: {G['text_muted']}; }}
+QComboBox::drop-down {{ border: none; width: 20px; }}
 QComboBox::down-arrow {{
     image: none;
     border-left: 4px solid transparent;
@@ -198,8 +190,21 @@ QComboBox QAbstractItemView {{
     border: 1px solid {G['border']};
     selection-background-color: {G['green_dark']};
     selection-color: {G['green']};
-    padding: 4px;
+    padding: 2px;
+    outline: none;
 }}
+
+/* ── TextEdit ── */
+QTextEdit {{
+    background: {G['surface2']};
+    border: 1px solid {G['border']};
+    border-radius: 3px;
+    padding: 6px 10px;
+    color: {G['text']};
+    selection-background-color: {G['green_dark']};
+    selection-color: {G['green_hi']};
+}}
+QTextEdit:focus {{ border-color: {G['green']}; background: #0a150a; }}
 
 /* ── Buttons ── */
 QPushButton {{
@@ -207,7 +212,7 @@ QPushButton {{
     color: {G['text']};
     border: 1px solid {G['border']};
     border-radius: 3px;
-    padding: 7px 16px;
+    padding: 6px 16px;
     font-size: 11px;
     letter-spacing: 1px;
 }}
@@ -221,28 +226,34 @@ QPushButton:pressed {{
     color: {G['bg']};
 }}
 QPushButton:disabled {{
-    background: {G['surface2']};
     color: {G['text_muted']};
     border-color: {G['border2']};
 }}
 QPushButton#primary {{
     background: {G['green_dark']};
-    border-color: {G['green_lo']};
+    border: 1px solid {G['green_lo']};
     color: {G['green']};
     font-weight: bold;
     letter-spacing: 2px;
+    padding: 8px 24px;
+    font-size: 12px;
 }}
 QPushButton#primary:hover {{
     background: {G['green_lo']};
+    border-color: {G['green']};
+    color: {G['bg']};
+}}
+QPushButton#primary:pressed {{
+    background: {G['green']};
     color: {G['bg']};
 }}
 QPushButton#danger {{
-    background: #1a0505;
-    border-color: #4a1010;
+    background: #160404;
+    border-color: #3d0d0d;
     color: {G['red']};
 }}
 QPushButton#danger:hover {{
-    background: #3a0a0a;
+    background: #2e0808;
     border-color: {G['red']};
 }}
 
@@ -256,10 +267,7 @@ QTableWidget {{
     selection-background-color: {G['green_dark']};
     selection-color: {G['green_hi']};
 }}
-QTableWidget::item {{
-    padding: 5px 8px;
-    border: none;
-}}
+QTableWidget::item {{ padding: 5px 8px; border: none; }}
 QTableWidget::item:selected {{
     background: {G['green_dark']};
     color: {G['green_hi']};
@@ -276,40 +284,26 @@ QHeaderView::section {{
 }}
 
 /* ── Scrollbars ── */
-QScrollBar:vertical {{
-    background: {G['bg']};
-    width: 6px;
-    border: none;
-}}
+QScrollBar:vertical {{ background: {G['bg']}; width: 7px; border: none; }}
 QScrollBar::handle:vertical {{
     background: {G['border']};
     border-radius: 3px;
-    min-height: 20px;
+    min-height: 24px;
 }}
-QScrollBar::handle:vertical:hover {{
-    background: {G['green_lo']};
-}}
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
-    height: 0;
-}}
-QScrollBar:horizontal {{
-    background: {G['bg']};
-    height: 6px;
-    border: none;
-}}
+QScrollBar::handle:vertical:hover {{ background: {G['green_lo']}; }}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{ height: 0; }}
+QScrollBar:horizontal {{ background: {G['bg']}; height: 7px; border: none; }}
 QScrollBar::handle:horizontal {{
     background: {G['border']};
     border-radius: 3px;
+    min-width: 24px;
 }}
+QScrollBar::handle:horizontal:hover {{ background: {G['green_lo']}; }}
 
 /* ── MessageBox ── */
-QMessageBox {{
-    background: {G['surface']};
-}}
-QMessageBox QLabel {{
-    color: {G['text']};
-    font-size: 13px;
-}}
+QMessageBox {{ background: {G['surface']}; }}
+QMessageBox QLabel {{ color: {G['text']}; font-size: 12px; }}
+QMessageBox QPushButton {{ min-width: 72px; }}
 
 /* ── StatusBar ── */
 QStatusBar {{
@@ -320,20 +314,13 @@ QStatusBar {{
     padding: 2px 8px;
 }}
 
-/* ── InputDialog ── */
-QInputDialog {{
-    background: {G['surface']};
-}}
+/* ── Dialogs ── */
+QInputDialog {{ background: {G['surface']}; }}
 
 /* ── CheckBox ── */
-QCheckBox {{
-    color: {G['text']};
-    spacing: 6px;
-    font-size: 12px;
-}}
+QCheckBox {{ color: {G['text']}; spacing: 6px; font-size: 12px; }}
 QCheckBox::indicator {{
-    width: 14px;
-    height: 14px;
+    width: 14px; height: 14px;
     border: 1px solid {G['border']};
     border-radius: 2px;
     background: {G['surface2']};
@@ -342,9 +329,10 @@ QCheckBox::indicator:checked {{
     background: {G['green_dark']};
     border-color: {G['green_lo']};
 }}
-QCheckBox::indicator:hover {{
+QCheckBox::indicator:checked:hover {{
     border-color: {G['green']};
 }}
+QCheckBox::indicator:hover {{ border-color: {G['green']}; }}
 
 /* ── SpinBox ── */
 QSpinBox, QDoubleSpinBox {{
@@ -354,14 +342,26 @@ QSpinBox, QDoubleSpinBox {{
     padding: 5px 8px;
     color: {G['text']};
 }}
-QSpinBox:focus, QDoubleSpinBox:focus {{
-    border-color: {G['green']};
-}}
+QSpinBox:focus, QDoubleSpinBox:focus {{ border-color: {G['green']}; }}
 QSpinBox::up-button, QDoubleSpinBox::up-button,
 QSpinBox::down-button, QDoubleSpinBox::down-button {{
     background: {G['surface']};
     border: none;
     width: 18px;
+}}
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {{
+    background: {G['green_dark']};
+}}
+
+/* ── ToolTip ── */
+QToolTip {{
+    background: {G['surface2']};
+    color: {G['text']};
+    border: 1px solid {G['green_lo']};
+    border-radius: 3px;
+    padding: 3px 7px;
+    font-size: 11px;
 }}
 """
 
@@ -1123,6 +1123,7 @@ def _load_app_settings() -> dict:
         'use_i2p': False, 'i2p_sam': '127.0.0.1:7656',
         'warn_no_privacy': True,
         'address_book': {},   # {address: name}
+        'shortcut_created': False,
     }
     try:
         with open(_SETTINGS_PATH, encoding='utf-8') as f:
@@ -1512,6 +1513,36 @@ def _stat_row(layout, row, label_text, value_text='—', value_color=None):
     return val
 
 
+def _make_app_icon() -> 'QIcon':
+    _base = os.path.dirname(os.path.abspath(__file__))
+    for name in ('btq_wallet.ico', 'btq_wallet.png', 'btq_wallet.jpg'):
+        path = os.path.join(_base, name)
+        if os.path.isfile(path):
+            icon = QIcon(path)
+            if not icon.isNull():
+                return icon
+    # fallback: draw icon programmatically
+    sizes = [16, 32, 48, 64, 128, 256]
+    icon = QIcon()
+    for sz in sizes:
+        pm = QPixmap(sz, sz)
+        pm.fill(QColor('#050505'))
+        p = QPainter(pm)
+        p.setRenderHint(QPainter.Antialiasing)
+        margin = max(2, sz // 16)
+        pen = QPen(QColor('#00a152'), max(1, sz // 32))
+        p.setPen(pen)
+        p.setBrush(QColor('#001f0d'))
+        p.drawEllipse(margin, margin, sz - margin * 2, sz - margin * 2)
+        font = QFont('Consolas', max(6, sz * 28 // 100), QFont.Bold)
+        p.setFont(font)
+        p.setPen(QColor('#00e676'))
+        p.drawText(pm.rect(), Qt.AlignCenter, 'BTQ')
+        p.end()
+        icon.addPixmap(pm)
+    return icon
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Ventana principal
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1554,6 +1585,7 @@ class WalletGUI(QMainWindow):
 
     def _build_ui(self):
         self.setWindowTitle(f'BTQ Wallet  v{__version__}')
+        self.setWindowIcon(_make_app_icon())
         self.setMinimumSize(1000, 680)
         self.setStyleSheet(STYLE)
 
@@ -1766,7 +1798,7 @@ class WalletGUI(QMainWindow):
     def _tab_balance(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(20, 16, 20, 16)
+        v.setContentsMargins(20, 14, 20, 14)
         v.setSpacing(12)
 
         # Hero balance
@@ -1835,7 +1867,7 @@ class WalletGUI(QMainWindow):
     def _tab_addresses(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(20, 16, 20, 16)
+        v.setContentsMargins(20, 14, 20, 14)
 
         toolbar = QHBoxLayout()
         btn_new = _btn(t('btn_new_address'), obj_name='primary')
@@ -1865,7 +1897,7 @@ class WalletGUI(QMainWindow):
     def _tab_receive(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(20, 16, 20, 16)
+        v.setContentsMargins(20, 14, 20, 14)
         v.setAlignment(Qt.AlignTop)
 
         # Selector
@@ -1911,7 +1943,7 @@ class WalletGUI(QMainWindow):
     def _tab_send(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(20, 16, 20, 16)
+        v.setContentsMargins(20, 14, 20, 14)
 
         form = QGroupBox(t('group_send'))
         fg = QGridLayout(form)
@@ -2078,7 +2110,7 @@ class WalletGUI(QMainWindow):
     def _tab_transactions(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(20, 16, 20, 16)
+        v.setContentsMargins(20, 14, 20, 14)
 
         toolbar = QHBoxLayout()
         toolbar.addStretch()
@@ -2113,7 +2145,7 @@ class WalletGUI(QMainWindow):
     def _tab_network(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(20, 16, 20, 16)
+        v.setContentsMargins(20, 14, 20, 14)
 
         toolbar = QHBoxLayout()
         toolbar.addStretch()
@@ -2173,7 +2205,7 @@ class WalletGUI(QMainWindow):
     def _tab_sign(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(20, 16, 20, 16)
+        v.setContentsMargins(20, 14, 20, 14)
         v.setSpacing(12)
 
         # ── Sign ──────────────────────────────────────────────────────────
@@ -2256,7 +2288,7 @@ class WalletGUI(QMainWindow):
     def _tab_settings(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(20, 16, 20, 16)
+        v.setContentsMargins(20, 14, 20, 14)
 
         # ── RPC connection ────────────────────────────────────────────────
         rpc_box = QGroupBox(t('group_rpc'))
@@ -3543,6 +3575,58 @@ class WalletGUI(QMainWindow):
 
     # ──────────────────────────── System tray ─────────────────────────────
 
+    def _maybe_create_shortcut(self):
+        pass  # shortcut creation moved to _create_shortcut_if_needed() in main()
+
+    def _create_desktop_shortcut(self):
+        import tempfile
+        desktop = os.path.join(os.path.expanduser('~'), 'Desktop')
+        lnk_path = os.path.join(desktop, 'BTQ Wallet.lnk')
+        if os.path.exists(lnk_path):
+            return
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        icon_path = os.path.join(_dir, 'btq_wallet.ico')
+        if not os.path.isfile(icon_path):
+            icon_path = sys.executable
+        if getattr(sys, 'frozen', False):
+            # PyInstaller binary — target is the .exe itself
+            target = sys.executable
+            args = ''
+        else:
+            target = sys.executable
+            args = os.path.abspath(__file__)
+        # VBScript — reliable from pythonw.exe (no console required)
+        def dq(s): return s.replace('"', '""')
+        vbs = (
+            'Set sh = WScript.CreateObject("WScript.Shell")\n'
+            f'Set lnk = sh.CreateShortcut("{dq(lnk_path)}")\n'
+            f'lnk.TargetPath = "{dq(target)}"\n'
+            f'lnk.Arguments = Chr(34) & "{dq(args)}" & Chr(34)\n'
+            f'lnk.WorkingDirectory = "{dq(_dir)}"\n'
+            f'lnk.IconLocation = "{dq(icon_path)}"\n'
+            'lnk.Description = "BTQ Wallet - Post-Quantum Bitcoin"\n'
+            'lnk.Save\n'
+        )
+        tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.vbs',
+                                          delete=False, encoding='utf-8')
+        tmp.write(vbs)
+        tmp.close()
+        try:
+            wscript = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
+                                   'System32', 'wscript.exe')
+            subprocess.run(
+                [wscript, '//nologo', tmp.name],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=15
+            )
+        finally:
+            try:
+                os.unlink(tmp.name)
+            except OSError:
+                pass
+
     def _setup_tray(self):
         if not QSystemTrayIcon.isSystemTrayAvailable():
             return
@@ -4070,9 +4154,72 @@ class WalletGUI(QMainWindow):
 
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _create_shortcut_if_needed():
+    """Create desktop shortcut on first run (Windows only)."""
+    _dbg = os.path.join(os.path.dirname(os.path.abspath(__file__)), '_sc_debug.txt')
+    try:
+        with open(_dbg, 'w', encoding='utf-8') as _f:
+            _f.write(f"called, _IS_WIN={_IS_WIN}, __file__={__file__}\n")
+    except Exception:
+        pass
+    if not _IS_WIN:
+        return
+    settings = _load_app_settings()
+    if settings.get('shortcut_created'):
+        return
+    import tempfile
+    desktop = os.path.join(os.path.expanduser('~'), 'Desktop')
+    lnk_path = os.path.join(desktop, 'BTQ Wallet.lnk')
+    if os.path.exists(lnk_path):
+        settings['shortcut_created'] = True
+        _save_app_settings(settings)
+        return
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    icon_path = os.path.join(_dir, 'btq_wallet.ico')
+    if not os.path.isfile(icon_path):
+        icon_path = sys.executable
+    if getattr(sys, 'frozen', False):
+        target = sys.executable
+        args = ''
+    else:
+        target = sys.executable
+        args = os.path.abspath(__file__)
+    def dq(s): return s.replace('"', '""')
+    vbs = (
+        'Set sh = WScript.CreateObject("WScript.Shell")\n'
+        f'Set lnk = sh.CreateShortcut("{dq(lnk_path)}")\n'
+        f'lnk.TargetPath = "{dq(target)}"\n'
+        f'lnk.Arguments = Chr(34) & "{dq(args)}" & Chr(34)\n'
+        f'lnk.WorkingDirectory = "{dq(_dir)}"\n'
+        f'lnk.IconLocation = "{dq(icon_path)}"\n'
+        'lnk.Description = "BTQ Wallet - Post-Quantum Bitcoin"\n'
+        'lnk.Save\n'
+    )
+    try:
+        tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.vbs',
+                                          delete=False, encoding='utf-8')
+        tmp.write(vbs)
+        tmp.close()
+        wscript = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
+                               'System32', 'wscript.exe')
+        subprocess.run([wscript, '//nologo', tmp.name],
+                       stdin=subprocess.DEVNULL,
+                       stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL,
+                       timeout=15)
+        os.unlink(tmp.name)
+        if os.path.exists(lnk_path):
+            settings['shortcut_created'] = True
+            _save_app_settings(settings)
+    except Exception:
+        pass
+
+
 def main():
+    _create_shortcut_if_needed()
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
+    app.setWindowIcon(_make_app_icon())
     gui = WalletGUI()
     gui.show()
     sys.exit(app.exec_())
