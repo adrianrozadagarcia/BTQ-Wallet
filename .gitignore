@@ -35,4 +35,6 @@ __pycache__/
 dist/
 build/
 *.egg-info/
+*.spec.bak
+__pycache__/BTQWallet/
 

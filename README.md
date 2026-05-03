@@ -8,6 +8,24 @@ No accounts. No cloud. No tracking. Your keys, your coins.
 
 ---
 
+## Quick Start
+
+### Option A — Standalone binary (no Python required)
+
+Download `BTQWallet.exe` (Windows) or `BTQWallet` (Linux/macOS) from the [**Releases page**](https://github.com/adrianrozadagarcia/BTQ-Wallet/releases) and double-click it. That's it.
+
+### Option B — Run from source
+
+| Platform | Command |
+|---|---|
+| Windows | Double-click **`launch.bat`** |
+| Linux | `chmod +x launch.sh && ./launch.sh` |
+| macOS | Double-click **`launch.command`** |
+
+The launcher scripts handle everything: Python version check, virtual environment, dependency install.
+
+---
+
 ## What is BTQ?
 
 Bitcoin Quantum is a testnet blockchain that replaces ECDSA with **CRYSTALS-Dilithium**, a post-quantum cryptographic signature scheme. It is designed to remain secure even against adversaries with access to large-scale quantum computers — a threat that ECDSA-based blockchains are not immune to.
@@ -23,90 +41,20 @@ This wallet is a lightweight GUI to interact with a local `btqd` node over JSON-
 - QR code display for receiving funds
 - Transaction history with confirmations
 - Network & blockchain stats
+- **Wallet encryption** — `encryptwallet` / `walletpassphrase` / `walletlock` via Settings
+- **Fee selector** — Slow / Normal / Fast / Custom with live BTQ estimate
+- **Coin control** — select specific UTXOs to spend
 - **Session lock** — PIN-protected, auto-locks on inactivity
 - **Encrypted backups** — AES-256-CBC exports (`.btqenc`) with PBKDF2 key derivation
+- **System tray** — minimize to tray, incoming transaction notifications
+- **Tor support** — route node traffic through Tor (`-proxy` / `-onlynet=onion`)
 - **Clipboard auto-clear** — copied addresses wiped after N seconds
 - **Large-send confirmation** — extra prompt above a configurable threshold
 - **Address reuse warning** — flags previously-used destination addresses
-- **Node integrity check** — SHA-256 verification of `btqd.exe` before launch
-- **Hardened settings file** — restricted to owner read/write via NTFS ACLs
+- **Node integrity check** — SHA-256 verification of `btqd` before launch
+- **Hardened settings file** — owner read/write only (NTFS ACLs / chmod 600)
 - Multi-language UI: English, Español, Русский, 中文
-
----
-
-## Requirements
-
-| Dependency | Version | Notes |
-|---|---|---|
-| Python | 3.9+ | |
-| PyQt5 | 5.15+ | GUI framework |
-| qrcode[pil] | 7.0+ | QR code generation |
-| cryptography | 41.0+ | Encrypted backups (optional but recommended) |
-| BTQ node (`btqd.exe`) | 0.3.0+ | Must be running for wallet to connect |
-
----
-
-## Installation
-
-### Windows
-
-Double-click **`launch.bat`** — it handles the virtual environment and dependencies automatically.
-
-Or from a terminal:
-
-```bat
-git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
-cd BTQ-Wallet
-launch.bat
-```
-
-### Linux
-
-```bash
-# 1. Install system prerequisites (Debian/Ubuntu example)
-sudo apt install python3 python3-venv python3-pip python3-pyqt5
-
-# 2. Clone and launch
-git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
-cd BTQ-Wallet
-chmod +x launch.sh start_node.sh
-./launch.sh
-```
-
-On Fedora/RHEL: `sudo dnf install python3 python3-qt5`  
-On Arch: `sudo pacman -S python python-pyqt5`
-
-**Optional — desktop launcher:**
-
-```bash
-# Install for the current user (shows up in your app menu)
-cp btq-wallet.desktop ~/.local/share/applications/
-# Edit the Exec path to point to your clone directory, then:
-update-desktop-database ~/.local/share/applications/
-```
-
-### macOS
-
-```bash
-# Install prerequisites
-brew install python pyqt@5
-
-# Clone and launch
-git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
-cd BTQ-Wallet
-chmod +x launch.sh start_node.sh
-./launch.sh
-```
-
-### Manual (any platform)
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate      # Linux / macOS
-# .venv\Scripts\activate       # Windows
-pip install -r requirements.txt
-python simple_wallet_gui.py
-```
+- Windows · Linux · macOS
 
 ---
 
@@ -139,10 +87,40 @@ rpcallowip=127.0.0.1
 
 ---
 
+## Building from source (advanced)
+
+To build a standalone binary yourself:
+
+```bat
+REM Windows
+build.bat
+REM Output: dist\BTQWallet.exe
+```
+
+```bash
+# Linux / macOS
+chmod +x build.sh && ./build.sh
+# Output: dist/BTQWallet
+```
+
+Both scripts create a `.venv`, install [PyInstaller](https://pyinstaller.org), and produce a single-file executable with no external dependencies.
+
+**Runtime requirements (source only):**
+
+| Dependency | Version |
+|---|---|
+| Python | 3.9+ |
+| PyQt5 | 5.15+ |
+| qrcode[pil] | 7.0+ |
+| cryptography | 41.0+ |
+
+---
+
 ## Security
 
 - Private keys **never leave your machine** — all signing happens inside `btqd`
 - The wallet communicates with the node over **localhost only** (127.0.0.1)
+- Wallet file encrypted at rest via `encryptwallet` (AES-256 inside btqd)
 - Settings file (`btq_wallet_settings.json`) is restricted to the current OS user
 - Encrypted backups use AES-256-CBC with a 100,000-iteration PBKDF2 key derivation
 - PIN is stored as a SHA-256 hash — the plaintext PIN is never written to disk

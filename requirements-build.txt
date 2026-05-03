@@ -1,0 +1,2 @@
+# Build-time dependencies (not needed to run the wallet)
+pyinstaller>=6.0
