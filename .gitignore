@@ -1,0 +1,38 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Datos de la wallet local (NO subir — contienen claves privadas y saldos)
+simple_wallet.json
+wallet_cache.json
+btq_wallet_settings.json
+keys/
+*.dat
+*.btqenc
+
+# Cache de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Claude Code internals
+.claude/
+
+# Logs y temporales
+*.log
+*.tmp
+*.bak
+
+# Build / distribución
+dist/
+build/
+*.egg-info/
+
