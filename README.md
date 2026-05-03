@@ -48,33 +48,81 @@ This wallet is a lightweight GUI to interact with a local `btqd` node over JSON-
 
 ## Installation
 
-```bash
-# 1. Clone the repository
+### Windows
+
+Double-click **`launch.bat`** — it handles the virtual environment and dependencies automatically.
+
+Or from a terminal:
+
+```bat
 git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
 cd BTQ-Wallet
-
-# 2. Create a virtual environment (recommended)
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # Linux / macOS
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Run
-python simple_wallet_gui.py
+launch.bat
 ```
 
-Or on Windows, double-click **`launch.bat`** — it handles the virtual environment and dependencies automatically.
+### Linux
+
+```bash
+# 1. Install system prerequisites (Debian/Ubuntu example)
+sudo apt install python3 python3-venv python3-pip python3-pyqt5
+
+# 2. Clone and launch
+git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
+cd BTQ-Wallet
+chmod +x launch.sh start_node.sh
+./launch.sh
+```
+
+On Fedora/RHEL: `sudo dnf install python3 python3-qt5`  
+On Arch: `sudo pacman -S python python-pyqt5`
+
+**Optional — desktop launcher:**
+
+```bash
+# Install for the current user (shows up in your app menu)
+cp btq-wallet.desktop ~/.local/share/applications/
+# Edit the Exec path to point to your clone directory, then:
+update-desktop-database ~/.local/share/applications/
+```
+
+### macOS
+
+```bash
+# Install prerequisites
+brew install python pyqt@5
+
+# Clone and launch
+git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
+cd BTQ-Wallet
+chmod +x launch.sh start_node.sh
+./launch.sh
+```
+
+### Manual (any platform)
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate      # Linux / macOS
+# .venv\Scripts\activate       # Windows
+pip install -r requirements.txt
+python simple_wallet_gui.py
+```
 
 ---
 
 ## Node setup
 
-The wallet requires a local BTQ node. Download `btqd.exe` from the [BTQ releases page](https://github.com/btq-ag/btq-core/releases) and configure `btq.conf`:
+The wallet requires a local BTQ node. Download the binary for your platform from the [BTQ releases page](https://github.com/btq-ag/btq-core/releases).
+
+| Platform | Binary | Config path |
+|---|---|---|
+| Windows | `btqd.exe` | `%APPDATA%\BTQ\btq.conf` |
+| Linux | `btqd` | `~/.btq/btq.conf` |
+| macOS | `btqd` | `~/Library/Application Support/BTQ/btq.conf` |
+
+Create `btq.conf`:
 
 ```ini
-# %APPDATA%\BTQ\btq.conf
 testnet=1
 server=1
 rpcuser=youruser
@@ -82,9 +130,12 @@ rpcpassword=yourpassword
 rpcallowip=127.0.0.1
 ```
 
-Then use **Settings → BTQ Node → Start Node** to launch it from within the wallet, or run `start_node.bat` manually.
+**Windows:** use **Settings → BTQ Node → Start Node** or run `start_node.bat`.
 
-> **Windows note:** downloaded executables may be blocked by SmartScreen. The wallet handles this automatically (`Unblock-File`) on first launch.
+**Linux / macOS:** place `btqd` next to the wallet (or in `~/.local/bin/`), make it executable (`chmod +x btqd`), then use **Settings → BTQ Node → Start Node** or run `./start_node.sh`.
+
+> **Windows note:** downloaded executables may be blocked by SmartScreen. The wallet handles this automatically (`Unblock-File`) on first launch.  
+> **Linux note:** if `btqd` was downloaded (not installed via package manager), run `chmod +x btqd` before first use.
 
 ---
 

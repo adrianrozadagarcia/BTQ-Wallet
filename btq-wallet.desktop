@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.1
+Type=Application
+Name=BTQ Wallet
+GenericName=Bitcoin Quantum Wallet
+Comment=Post-quantum desktop wallet for the BTQ testnet
+Exec=bash -c 'cd "$(dirname "$(readlink -f "%k")")" && bash launch.sh'
+Icon=btq-wallet
+Terminal=false
+Categories=Finance;Network;
+Keywords=bitcoin;quantum;wallet;btq;crypto;dilithium;
+StartupNotify=true
