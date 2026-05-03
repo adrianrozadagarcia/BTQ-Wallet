@@ -476,12 +476,24 @@ TRANSLATIONS: dict = {
         'node_hash_reset_done': 'Hash reset — new hash recorded on next launch.',
         'group_node_integrity': 'NODE INTEGRITY',
         'addr_reuse_warning': 'This address was used before. Ask for a fresh address.',
-        'group_tor': 'TOR NETWORK',
-        'lbl_use_tor': 'Route node traffic through Tor',
-        'lbl_tor_proxy': 'Tor proxy (host:port)',
-        'tor_reachable': 'Tor reachable',
-        'tor_unreachable': 'Tor not reachable at {proxy}',
-        'tor_checking': 'Checking Tor...',
+        'group_tor': 'PRIVACY NETWORK',
+        'lbl_use_tor': 'Route traffic through Tor (SOCKS5)',
+        'lbl_tor_proxy': 'Tor SOCKS5 proxy (host:port)',
+        'tor_reachable': '⬤  Tor reachable',
+        'tor_unreachable': '⬤  Tor not reachable at {proxy}',
+        'tor_checking': 'Checking Tor…',
+        'lbl_use_i2p': 'Route traffic through I2P (SAM bridge)',
+        'lbl_i2p_sam': 'I2P SAM bridge (host:port)',
+        'i2p_reachable': '⬤  I2P reachable',
+        'i2p_unreachable': '⬤  I2P not reachable at {sam}',
+        'i2p_checking': 'Checking I2P…',
+        'lbl_warn_no_privacy': 'Warn before sending without Tor or I2P',
+        'dlg_no_privacy': 'No anonymization active.\n\nYour IP address may be visible to the network.\n\nSend anyway?',
+        'privacy_badge_direct': 'DIRECT',
+        'privacy_badge_tor': 'TOR',
+        'privacy_badge_i2p': 'I2P',
+        'privacy_update_via_tor': 'Update check routed through Tor.',
+        'privacy_update_direct': 'Update check uses direct connection (Tor/I2P inactive).',
         'group_coin_control': 'COIN CONTROL',
         'coin_control_hint': 'Select UTXOs to spend. Leave all unchecked to let the node choose automatically.',
         'btn_load_utxos': 'Refresh UTXOs',
@@ -633,11 +645,20 @@ TRANSLATIONS: dict = {
         'node_hash_reset_done': 'Hash restablecido — se registrará en el próximo inicio.',
         'group_node_integrity': 'INTEGRIDAD DEL NODO',
         'addr_reuse_warning': 'Esta dirección ya fue usada. Solicita una dirección nueva.',
-        'group_tor': 'RED TOR',
-        'lbl_use_tor': 'Enrutar tráfico del nodo por Tor',
-        'lbl_tor_proxy': 'Proxy Tor (host:puerto)',
-        'tor_reachable': 'Tor accesible',
-        'tor_unreachable': 'Tor no accesible en {proxy}',
+        'group_tor': 'RED DE PRIVACIDAD',
+        'lbl_use_tor': 'Enrutar tráfico por Tor (SOCKS5)',
+        'lbl_tor_proxy': 'Proxy SOCKS5 Tor (host:puerto)',
+        'tor_reachable': '⬤  Tor accesible',
+        'tor_unreachable': '⬤  Tor no accesible en {proxy}',
+        'lbl_use_i2p': 'Enrutar tráfico por I2P (SAM bridge)',
+        'lbl_i2p_sam': 'SAM bridge I2P (host:puerto)',
+        'i2p_reachable': '⬤  I2P accesible',
+        'i2p_unreachable': '⬤  I2P no accesible en {sam}',
+        'lbl_warn_no_privacy': 'Avisar al enviar sin Tor o I2P activos',
+        'dlg_no_privacy': 'Sin anonimización activa.\n\nTu IP puede ser visible en la red.\n\n¿Enviar de todas formas?',
+        'privacy_badge_direct': 'DIRECTO',
+        'privacy_badge_tor': 'TOR',
+        'privacy_badge_i2p': 'I2P',
         'tor_checking': 'Verificando Tor...',
         'group_coin_control': 'COIN CONTROL',
         'coin_control_hint': 'Selecciona UTXOs a gastar. Sin selección, el nodo elige automáticamente.',
@@ -786,11 +807,20 @@ TRANSLATIONS: dict = {
         'node_hash_reset_done': 'Хеш сброшен — новый будет записан при следующем запуске.',
         'group_node_integrity': 'ЦЕЛОСТНОСТЬ УЗЛА',
         'addr_reuse_warning': 'Этот адрес уже использовался. Запросите новый адрес.',
-        'group_tor': 'СЕТЬ TOR',
-        'lbl_use_tor': 'Направить трафик узла через Tor',
-        'lbl_tor_proxy': 'Прокси Tor (хост:порт)',
-        'tor_reachable': 'Tor доступен',
-        'tor_unreachable': 'Tor недоступен по {proxy}',
+        'group_tor': 'СЕТЬ ПРИВАТНОСТИ',
+        'lbl_use_tor': 'Направить трафик через Tor (SOCKS5)',
+        'lbl_tor_proxy': 'Прокси SOCKS5 Tor (хост:порт)',
+        'tor_reachable': '⬤  Tor доступен',
+        'tor_unreachable': '⬤  Tor недоступен по {proxy}',
+        'lbl_use_i2p': 'Направить трафик через I2P (SAM bridge)',
+        'lbl_i2p_sam': 'SAM bridge I2P (хост:порт)',
+        'i2p_reachable': '⬤  I2P доступен',
+        'i2p_unreachable': '⬤  I2P недоступен по {sam}',
+        'lbl_warn_no_privacy': 'Предупреждать при отправке без Tor/I2P',
+        'dlg_no_privacy': 'Анонимизация не активна.\n\nВаш IP может быть виден сети.\n\nОтправить?',
+        'privacy_badge_direct': 'ПРЯМОЙ',
+        'privacy_badge_tor': 'TOR',
+        'privacy_badge_i2p': 'I2P',
         'tor_checking': 'Проверка Tor...',
         'group_coin_control': 'COIN CONTROL',
         'coin_control_hint': 'Выберите UTXOs для трат. Без выбора — узел определит автоматически.',
@@ -939,11 +969,20 @@ TRANSLATIONS: dict = {
         'node_hash_reset_done': '哈希已重置 — 下次启动时记录新哈希。',
         'group_node_integrity': '节点完整性',
         'addr_reuse_warning': '此地址之前已使用过。建议请求新地址。',
-        'group_tor': 'TOR网络',
-        'lbl_use_tor': '通过Tor路由节点流量',
-        'lbl_tor_proxy': 'Tor代理（主机:端口）',
-        'tor_reachable': 'Tor可连接',
-        'tor_unreachable': '{proxy} 处Tor不可连接',
+        'group_tor': '隐私网络',
+        'lbl_use_tor': '通过Tor路由流量（SOCKS5）',
+        'lbl_tor_proxy': 'Tor SOCKS5代理（主机:端口）',
+        'tor_reachable': '⬤  Tor可连接',
+        'tor_unreachable': '⬤  {proxy} 处Tor不可连接',
+        'lbl_use_i2p': '通过I2P路由流量（SAM网桥）',
+        'lbl_i2p_sam': 'I2P SAM网桥（主机:端口）',
+        'i2p_reachable': '⬤  I2P可连接',
+        'i2p_unreachable': '⬤  {sam} 处I2P不可连接',
+        'lbl_warn_no_privacy': '发送前若无Tor/I2P则警告',
+        'dlg_no_privacy': '未启用匿名化。\n\n您的IP地址可能对网络可见。\n\n仍然发送？',
+        'privacy_badge_direct': '直连',
+        'privacy_badge_tor': 'TOR',
+        'privacy_badge_i2p': 'I2P',
         'tor_checking': '检查Tor中...',
         'group_coin_control': 'COIN CONTROL',
         'coin_control_hint': '选择要使用的UTXO。不选则由节点自动选择。',
@@ -1008,6 +1047,8 @@ def _load_app_settings() -> dict:
         'clipboard_clear_seconds': 30, 'confirm_threshold_btq': 0.0,
         'pin_hash': '', 'lock_timeout_minutes': 5, 'btqd_sha256': '',
         'use_tor': False, 'tor_proxy': '127.0.0.1:9050',
+        'use_i2p': False, 'i2p_sam': '127.0.0.1:7656',
+        'warn_no_privacy': True,
     }
     try:
         with open(_SETTINGS_PATH, encoding='utf-8') as f:
@@ -1259,15 +1300,32 @@ class BTQRPCClient:
 class _UpdateWorker(QThread):
     result = pyqtSignal(str)
 
+    def __init__(self, socks5_proxy: str = ''):
+        super().__init__()
+        self._proxy = socks5_proxy  # 'host:port' or ''
+
     def run(self):
+        import socket as _socket
+        _orig_socket = _socket.socket
         try:
+            if self._proxy:
+                try:
+                    import socks
+                    host, port = self._proxy.rsplit(':', 1)
+                    socks.set_default_proxy(socks.SOCKS5, host, int(port))
+                    _socket.socket = socks.socksocket
+                except ImportError:
+                    pass  # PySocks not installed — fall through to direct
+
             url = 'https://api.github.com/repos/adrianrozadagarcia/BTQ-Wallet/releases/latest'
             req = Request(url, headers={'User-Agent': f'BTQWallet/{__version__}'})
-            with urlopen(req, timeout=8) as resp:
+            with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read())
             self.result.emit(data.get('tag_name', ''))
         except Exception:
             self.result.emit('')
+        finally:
+            _socket.socket = _orig_socket
 
 
 class RPCWorker(QThread):
@@ -1605,6 +1663,13 @@ class WalletGUI(QMainWindow):
         h.addWidget(logo)
         h.addWidget(sub)
         h.addStretch()
+
+        self._privacy_badge = QLabel(t('privacy_badge_direct'))
+        self._privacy_badge.setStyleSheet(
+            f'color: {G["text_muted"]}; font-size: 10px; letter-spacing: 2px;'
+            f'padding: 4px 10px; background: {G["surface2"]}; border: 1px solid {G["border2"]}; border-radius: 3px;')
+        h.addWidget(self._privacy_badge)
+        h.addSpacing(8)
 
         self._badge = QLabel(t('badge_no_conn'))
         self._badge.setStyleSheet(
@@ -2205,12 +2270,13 @@ class WalletGUI(QMainWindow):
 
         v.addWidget(lock_box)
 
-        # ── Tor network ───────────────────────────────────────────────────
+        # ── Privacy network (Tor + I2P) ───────────────────────────────────
         tor_box = QGroupBox(t('group_tor'))
         tg = QGridLayout(tor_box)
         tg.setColumnStretch(1, 1)
-        tg.setSpacing(10)
+        tg.setSpacing(8)
 
+        # Tor
         self._chk_tor = QCheckBox(t('lbl_use_tor'))
         self._chk_tor.setChecked(self._app_settings.get('use_tor', False))
         self._chk_tor.stateChanged.connect(self._on_tor_changed)
@@ -2227,7 +2293,41 @@ class WalletGUI(QMainWindow):
         self._tor_status_lbl.setStyleSheet(f'color: {G["text_muted"]}; font-size: 11px;')
         tg.addWidget(self._tor_status_lbl, 2, 0, 1, 2)
 
+        # Separator
+        sep_line = QFrame(); sep_line.setFrameShape(QFrame.HLine)
+        sep_line.setStyleSheet(f'color: {G["border2"]};')
+        tg.addWidget(sep_line, 3, 0, 1, 2)
+
+        # I2P
+        self._chk_i2p = QCheckBox(t('lbl_use_i2p'))
+        self._chk_i2p.setChecked(self._app_settings.get('use_i2p', False))
+        self._chk_i2p.stateChanged.connect(self._on_i2p_changed)
+        tg.addWidget(self._chk_i2p, 4, 0, 1, 2)
+
+        tg.addWidget(_lbl(t('lbl_i2p_sam'), color=G['text_muted'], size=11), 5, 0)
+        self._i2p_sam_field = QLineEdit()
+        self._i2p_sam_field.setText(self._app_settings.get('i2p_sam', '127.0.0.1:7656'))
+        self._i2p_sam_field.setFixedWidth(200)
+        self._i2p_sam_field.editingFinished.connect(self._save_i2p_settings)
+        tg.addWidget(self._i2p_sam_field, 5, 1, Qt.AlignLeft)
+
+        self._i2p_status_lbl = QLabel('')
+        self._i2p_status_lbl.setStyleSheet(f'color: {G["text_muted"]}; font-size: 11px;')
+        tg.addWidget(self._i2p_status_lbl, 6, 0, 1, 2)
+
+        # Separator
+        sep_line2 = QFrame(); sep_line2.setFrameShape(QFrame.HLine)
+        sep_line2.setStyleSheet(f'color: {G["border2"]};')
+        tg.addWidget(sep_line2, 7, 0, 1, 2)
+
+        # Send-without-privacy warning
+        self._chk_warn_privacy = QCheckBox(t('lbl_warn_no_privacy'))
+        self._chk_warn_privacy.setChecked(self._app_settings.get('warn_no_privacy', True))
+        self._chk_warn_privacy.stateChanged.connect(self._save_privacy_network_settings)
+        tg.addWidget(self._chk_warn_privacy, 8, 0, 1, 2)
+
         v.addWidget(tor_box)
+        QTimer.singleShot(600, self._update_privacy_badge)
 
         # ── btq.conf help ─────────────────────────────────────────────────
         help_box = QGroupBox(t('group_btqconf'))
@@ -2439,14 +2539,21 @@ class WalletGUI(QMainWindow):
             pass
         self._unblock_file(btqd)
         datadir = _default_datadir()
-        tor_proxy = self._app_settings.get('tor_proxy', '127.0.0.1:9050') \
-                    if self._app_settings.get('use_tor') else None
+        use_tor = self._app_settings.get('use_tor', False)
+        use_i2p = self._app_settings.get('use_i2p', False)
+        tor_proxy = self._app_settings.get('tor_proxy', '127.0.0.1:9050') if use_tor else None
+        i2p_sam   = self._app_settings.get('i2p_sam',   '127.0.0.1:7656') if use_i2p else None
         args = [btqd, '-testnet', f'-datadir={datadir}']
         if _IS_WIN:
             args.append('-nodaemon')
         if tor_proxy:
             args.append(f'-proxy={tor_proxy}')
             args.append('-onlynet=onion')
+        if i2p_sam:
+            args.append(f'-i2psam={i2p_sam}')
+            args.append('-i2pacceptincoming')
+            if not tor_proxy:
+                args.append('-onlynet=i2p')
         popen_kwargs = {}
         if _IS_WIN:
             popen_kwargs['creationflags'] = 0x08000008
@@ -2799,6 +2906,16 @@ class WalletGUI(QMainWindow):
         if not self._auto_unlock_for_send():
             return
 
+        if self._app_settings.get('warn_no_privacy', True):
+            no_tor = not self._app_settings.get('use_tor', False)
+            no_i2p = not self._app_settings.get('use_i2p', False)
+            if no_tor and no_i2p:
+                if QMessageBox.question(
+                    self, t('tab_send'), t('dlg_no_privacy'),
+                    QMessageBox.Yes | QMessageBox.No
+                ) != QMessageBox.Yes:
+                    return
+
         selected = self._get_selected_utxos() if hasattr(self, '_utxo_table') else []
         if selected:
             self._send_with_coin_control(to, amount, note, selected)
@@ -2989,14 +3106,14 @@ class WalletGUI(QMainWindow):
     # ──────────────────────────── Tor ─────────────────────────────────────
 
     def _on_tor_changed(self, state: int):
-        use_tor = bool(state)
-        self._app_settings['use_tor'] = use_tor
+        self._app_settings['use_tor'] = bool(state)
         _save_app_settings(self._app_settings)
-        if use_tor:
+        if state:
             self._check_tor()
         else:
             if hasattr(self, '_tor_status_lbl'):
                 self._tor_status_lbl.setText('')
+        self._update_privacy_badge()
 
     def _save_tor_settings(self):
         proxy = self._tor_proxy_field.text().strip() or '127.0.0.1:9050'
@@ -3018,11 +3135,75 @@ class WalletGUI(QMainWindow):
                 self._tor_status_lbl.setText(t('tor_reachable'))
                 self._tor_status_lbl.setStyleSheet(
                     f'color: {G["green"]}; font-size: 11px;')
+            self._update_privacy_badge()
         except Exception:
             if hasattr(self, '_tor_status_lbl'):
                 self._tor_status_lbl.setText(t('tor_unreachable', proxy=proxy))
                 self._tor_status_lbl.setStyleSheet(
                     f'color: {G["red"]}; font-size: 11px;')
+
+    def _on_i2p_changed(self, state: int):
+        self._app_settings['use_i2p'] = bool(state)
+        _save_app_settings(self._app_settings)
+        if state:
+            self._check_i2p()
+        else:
+            if hasattr(self, '_i2p_status_lbl'):
+                self._i2p_status_lbl.setText('')
+        self._update_privacy_badge()
+
+    def _save_i2p_settings(self):
+        sam = self._i2p_sam_field.text().strip() or '127.0.0.1:7656'
+        self._app_settings['i2p_sam'] = sam
+        _save_app_settings(self._app_settings)
+        if self._app_settings.get('use_i2p'):
+            self._check_i2p()
+
+    def _check_i2p(self):
+        import socket
+        sam = self._app_settings.get('i2p_sam', '127.0.0.1:7656')
+        if hasattr(self, '_i2p_status_lbl'):
+            self._i2p_status_lbl.setText(t('i2p_checking'))
+        try:
+            host, port_str = sam.rsplit(':', 1)
+            sock = socket.create_connection((host, int(port_str)), timeout=3)
+            sock.close()
+            if hasattr(self, '_i2p_status_lbl'):
+                self._i2p_status_lbl.setText(t('i2p_reachable'))
+                self._i2p_status_lbl.setStyleSheet(
+                    f'color: {G["green"]}; font-size: 11px;')
+            self._update_privacy_badge()
+        except Exception:
+            if hasattr(self, '_i2p_status_lbl'):
+                self._i2p_status_lbl.setText(t('i2p_unreachable', sam=sam))
+                self._i2p_status_lbl.setStyleSheet(
+                    f'color: {G["red"]}; font-size: 11px;')
+
+    def _save_privacy_network_settings(self):
+        self._app_settings['warn_no_privacy'] = self._chk_warn_privacy.isChecked()
+        _save_app_settings(self._app_settings)
+
+    def _update_privacy_badge(self):
+        if not hasattr(self, '_privacy_badge'):
+            return
+        use_tor = self._app_settings.get('use_tor', False)
+        use_i2p = self._app_settings.get('use_i2p', False)
+        if use_tor and use_i2p:
+            label = f'{t("privacy_badge_tor")} + {t("privacy_badge_i2p")}'
+            color, bg, border = G['green'], G['green_dark'], G['green_lo']
+        elif use_tor:
+            label = t('privacy_badge_tor')
+            color, bg, border = G['green'], G['green_dark'], G['green_lo']
+        elif use_i2p:
+            label = t('privacy_badge_i2p')
+            color, bg, border = '#a78bfa', '#1a0a2e', '#4a2a7e'
+        else:
+            label = t('privacy_badge_direct')
+            color, bg, border = G['text_muted'], G['surface2'], G['border2']
+        self._privacy_badge.setText(label)
+        self._privacy_badge.setStyleSheet(
+            f'color: {color}; font-size: 10px; letter-spacing: 2px;'
+            f'padding: 4px 10px; background: {bg}; border: 1px solid {border}; border-radius: 3px;')
 
     # ──────────────────────────── Encrypted backup ────────────────────────
 
@@ -3191,7 +3372,10 @@ class WalletGUI(QMainWindow):
     # ──────────────────────────── Auto-update ─────────────────────────────
 
     def _check_for_update(self):
-        worker = _UpdateWorker()
+        proxy = ''
+        if self._app_settings.get('use_tor'):
+            proxy = self._app_settings.get('tor_proxy', '127.0.0.1:9050')
+        worker = _UpdateWorker(socks5_proxy=proxy)
         worker.result.connect(self._on_update_result)
         worker.setParent(self)
         worker.start()
