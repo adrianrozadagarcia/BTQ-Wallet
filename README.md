@@ -50,7 +50,7 @@ This wallet is a lightweight GUI to interact with a local `btqd` node over JSON-
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/BTQ-Wallet.git
+git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
 cd BTQ-Wallet
 
 # 2. Create a virtual environment (recommended)

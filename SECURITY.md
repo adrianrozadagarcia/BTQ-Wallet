@@ -12,7 +12,7 @@ If you discover a security vulnerability in BTQ Wallet, please report it
 
 **How to report:**
 
-1. Open a [GitHub Security Advisory](https://github.com/your-username/BTQ-Wallet/security/advisories/new)
+1. Open a [GitHub Security Advisory](https://github.com/adrianrozadagarcia/BTQ-Wallet/security/advisories/new)
    on this repository (preferred), **or**
 2. Send an encrypted email to the maintainer. PGP key available on request.
 
