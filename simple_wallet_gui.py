@@ -33,7 +33,7 @@ try:
         QTabWidget, QMessageBox, QFileDialog, QGroupBox, QGridLayout,
         QHeaderView, QStatusBar, QComboBox, QInputDialog, QFrame,
         QSizePolicy, QAbstractItemView, QCheckBox, QSpinBox, QDoubleSpinBox,
-        QDialog
+        QDialog, QSystemTrayIcon, QMenu, QAction
     )
     from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QSize, QEvent
     from PyQt5.QtGui import QFont, QPixmap, QColor, QFontDatabase
@@ -492,6 +492,42 @@ TRANSLATIONS: dict = {
         'coin_control_insufficient': 'Selected UTXOs insufficient.\nSelected: {selected:.8f}\nNeeded: ~{needed:.8f} BTQ',
         'dlg_coin_control_send': 'Send {amount:.8f} BTQ to:\n{addr}\n\nInputs:  {selected:.8f} BTQ\nFee:     {fee:.8f} BTQ\nChange:  {change:.8f} BTQ',
         'settings_saved': 'Settings saved',
+        # Wallet encryption
+        'group_wallet_enc': 'WALLET ENCRYPTION',
+        'wallet_enc_unencrypted': 'Not encrypted — wallet.dat is stored in plaintext on disk.',
+        'wallet_enc_locked': 'Encrypted · locked',
+        'wallet_enc_unlocked': 'Encrypted · unlocked',
+        'btn_encrypt_wallet': 'Encrypt Wallet',
+        'btn_unlock_wallet': 'Unlock',
+        'btn_lock_wallet': 'Lock',
+        'btn_change_passphrase': 'Change Passphrase',
+        'dlg_enc_passphrase': 'Wallet passphrase:',
+        'dlg_enc_confirm': 'Confirm passphrase:',
+        'dlg_enc_mismatch': 'Passphrases do not match.',
+        'dlg_enc_done': 'Wallet encrypted.\n\nThe node will restart — reconnect in a few seconds.',
+        'dlg_enc_unlock_timeout': 'Unlock for how many seconds?',
+        'dlg_enc_locked_send': 'Wallet is locked. Enter passphrase to unlock for sending:',
+        'dlg_enc_unlocked': 'Wallet unlocked.',
+        'dlg_enc_locked_ok': 'Wallet locked.',
+        'dlg_enc_changed': 'Passphrase changed.',
+        'dlg_enc_old_pass': 'Current passphrase:',
+        'dlg_enc_new_pass': 'New passphrase:',
+        # Fee selector
+        'group_fee': 'TRANSACTION FEE',
+        'fee_slow': 'Slow  (~24 blocks)',
+        'fee_normal': 'Normal  (~6 blocks)',
+        'fee_fast': 'Fast  (~2 blocks)',
+        'fee_custom': 'Custom',
+        'lbl_fee_estimate': 'Estimated fee: {fee:.8f} BTQ',
+        'lbl_fee_rate': 'Fee rate (BTQ/kB):',
+        # System tray
+        'tray_tooltip': 'BTQ Wallet',
+        'tray_open': 'Open Wallet',
+        'tray_lock': 'Lock Wallet',
+        'tray_quit': 'Quit',
+        'tray_hidden': 'BTQ Wallet is running in the background.',
+        'tray_new_tx': 'New transaction',
+        'tray_received': 'Received {amount:.8f} BTQ',
     },
     'es': {
         'tab_balance': 'BALANCE', 'tab_addresses': 'DIRECCIONES',
@@ -609,6 +645,39 @@ TRANSLATIONS: dict = {
         'coin_control_insufficient': 'UTXOs insuficientes.\nSeleccionado: {selected:.8f}\nNecesario: ~{needed:.8f} BTQ',
         'dlg_coin_control_send': 'Enviar {amount:.8f} BTQ a:\n{addr}\n\nEntradas: {selected:.8f} BTQ\nComisión: {fee:.8f} BTQ\nCambio:   {change:.8f} BTQ',
         'settings_saved': 'Configuración guardada',
+        'group_wallet_enc': 'CIFRADO DE WALLET',
+        'wallet_enc_unencrypted': 'Sin cifrar — wallet.dat se guarda en texto plano en disco.',
+        'wallet_enc_locked': 'Cifrada · bloqueada',
+        'wallet_enc_unlocked': 'Cifrada · desbloqueada',
+        'btn_encrypt_wallet': 'Cifrar Wallet',
+        'btn_unlock_wallet': 'Desbloquear',
+        'btn_lock_wallet': 'Bloquear',
+        'btn_change_passphrase': 'Cambiar Contraseña',
+        'dlg_enc_passphrase': 'Contraseña de la wallet:',
+        'dlg_enc_confirm': 'Confirmar contraseña:',
+        'dlg_enc_mismatch': 'Las contraseñas no coinciden.',
+        'dlg_enc_done': 'Wallet cifrada.\n\nEl nodo se reiniciará — reconecta en unos segundos.',
+        'dlg_enc_unlock_timeout': '¿Desbloquear durante cuántos segundos?',
+        'dlg_enc_locked_send': 'La wallet está bloqueada. Introduce la contraseña para desbloquear:',
+        'dlg_enc_unlocked': 'Wallet desbloqueada.',
+        'dlg_enc_locked_ok': 'Wallet bloqueada.',
+        'dlg_enc_changed': 'Contraseña cambiada.',
+        'dlg_enc_old_pass': 'Contraseña actual:',
+        'dlg_enc_new_pass': 'Nueva contraseña:',
+        'group_fee': 'COMISIÓN DE TRANSACCIÓN',
+        'fee_slow': 'Lento  (~24 bloques)',
+        'fee_normal': 'Normal  (~6 bloques)',
+        'fee_fast': 'Rápido  (~2 bloques)',
+        'fee_custom': 'Personalizado',
+        'lbl_fee_estimate': 'Comisión estimada: {fee:.8f} BTQ',
+        'lbl_fee_rate': 'Tasa de comisión (BTQ/kB):',
+        'tray_tooltip': 'BTQ Wallet',
+        'tray_open': 'Abrir Wallet',
+        'tray_lock': 'Bloquear Wallet',
+        'tray_quit': 'Salir',
+        'tray_hidden': 'BTQ Wallet está ejecutándose en segundo plano.',
+        'tray_new_tx': 'Nueva transacción',
+        'tray_received': 'Recibido {amount:.8f} BTQ',
     },
     'ru': {
         'tab_balance': 'БАЛАНС', 'tab_addresses': 'АДРЕСА',
@@ -726,6 +795,39 @@ TRANSLATIONS: dict = {
         'coin_control_insufficient': 'Недостаточно UTXOs.\nВыбрано: {selected:.8f}\nНужно: ~{needed:.8f} BTQ',
         'dlg_coin_control_send': 'Отправить {amount:.8f} BTQ на:\n{addr}\n\nВходы:    {selected:.8f} BTQ\nКомиссия: {fee:.8f} BTQ\nСдача:    {change:.8f} BTQ',
         'settings_saved': 'Настройки сохранены',
+        'group_wallet_enc': 'ШИФРОВАНИЕ КОШЕЛЬКА',
+        'wallet_enc_unencrypted': 'Не зашифрован — wallet.dat хранится в открытом виде.',
+        'wallet_enc_locked': 'Зашифрован · заблокирован',
+        'wallet_enc_unlocked': 'Зашифрован · разблокирован',
+        'btn_encrypt_wallet': 'Зашифровать',
+        'btn_unlock_wallet': 'Разблокировать',
+        'btn_lock_wallet': 'Заблокировать',
+        'btn_change_passphrase': 'Сменить пароль',
+        'dlg_enc_passphrase': 'Пароль кошелька:',
+        'dlg_enc_confirm': 'Подтвердите пароль:',
+        'dlg_enc_mismatch': 'Пароли не совпадают.',
+        'dlg_enc_done': 'Кошелёк зашифрован.\n\nУзел перезапустится — переподключитесь через несколько секунд.',
+        'dlg_enc_unlock_timeout': 'Разблокировать на сколько секунд?',
+        'dlg_enc_locked_send': 'Кошелёк заблокирован. Введите пароль для разблокировки:',
+        'dlg_enc_unlocked': 'Кошелёк разблокирован.',
+        'dlg_enc_locked_ok': 'Кошелёк заблокирован.',
+        'dlg_enc_changed': 'Пароль изменён.',
+        'dlg_enc_old_pass': 'Текущий пароль:',
+        'dlg_enc_new_pass': 'Новый пароль:',
+        'group_fee': 'КОМИССИЯ ТРАНЗАКЦИИ',
+        'fee_slow': 'Медленно  (~24 блока)',
+        'fee_normal': 'Нормально  (~6 блоков)',
+        'fee_fast': 'Быстро  (~2 блока)',
+        'fee_custom': 'Вручную',
+        'lbl_fee_estimate': 'Примерная комиссия: {fee:.8f} BTQ',
+        'lbl_fee_rate': 'Ставка комиссии (BTQ/кБ):',
+        'tray_tooltip': 'BTQ Wallet',
+        'tray_open': 'Открыть',
+        'tray_lock': 'Заблокировать',
+        'tray_quit': 'Выход',
+        'tray_hidden': 'BTQ Wallet работает в фоновом режиме.',
+        'tray_new_tx': 'Новая транзакция',
+        'tray_received': 'Получено {amount:.8f} BTQ',
     },
     'zh': {
         'tab_balance': '余额', 'tab_addresses': '地址',
@@ -843,6 +945,39 @@ TRANSLATIONS: dict = {
         'coin_control_insufficient': 'UTXO不足。\n已选: {selected:.8f}\n需要: ~{needed:.8f} BTQ',
         'dlg_coin_control_send': '发送 {amount:.8f} BTQ 到:\n{addr}\n\n输入:  {selected:.8f} BTQ\n手续费: {fee:.8f} BTQ\n找零:  {change:.8f} BTQ',
         'settings_saved': '设置已保存',
+        'group_wallet_enc': '钱包加密',
+        'wallet_enc_unencrypted': '未加密 — wallet.dat 以明文存储在磁盘上。',
+        'wallet_enc_locked': '已加密 · 已锁定',
+        'wallet_enc_unlocked': '已加密 · 已解锁',
+        'btn_encrypt_wallet': '加密钱包',
+        'btn_unlock_wallet': '解锁',
+        'btn_lock_wallet': '锁定',
+        'btn_change_passphrase': '更改密码',
+        'dlg_enc_passphrase': '钱包密码:',
+        'dlg_enc_confirm': '确认密码:',
+        'dlg_enc_mismatch': '密码不匹配。',
+        'dlg_enc_done': '钱包已加密。\n\n节点将重启 — 请几秒后重新连接。',
+        'dlg_enc_unlock_timeout': '解锁多少秒?',
+        'dlg_enc_locked_send': '钱包已锁定。请输入密码以解锁:',
+        'dlg_enc_unlocked': '钱包已解锁。',
+        'dlg_enc_locked_ok': '钱包已锁定。',
+        'dlg_enc_changed': '密码已更改。',
+        'dlg_enc_old_pass': '当前密码:',
+        'dlg_enc_new_pass': '新密码:',
+        'group_fee': '交易手续费',
+        'fee_slow': '慢速  (~24区块)',
+        'fee_normal': '普通  (~6区块)',
+        'fee_fast': '快速  (~2区块)',
+        'fee_custom': '自定义',
+        'lbl_fee_estimate': '预估手续费: {fee:.8f} BTQ',
+        'lbl_fee_rate': '手续费率 (BTQ/kB):',
+        'tray_tooltip': 'BTQ Wallet',
+        'tray_open': '打开钱包',
+        'tray_lock': '锁定钱包',
+        'tray_quit': '退出',
+        'tray_hidden': 'BTQ Wallet 正在后台运行。',
+        'tray_new_tx': '新交易',
+        'tray_received': '收到 {amount:.8f} BTQ',
     },
 }
 
@@ -1051,8 +1186,9 @@ class BTQRPCClient:
     def list_transactions(self, count=100):
         return self.call('listtransactions', '*', count, 0, True)
 
-    def send_to_address(self, address: str, amount: float, comment='') -> str:
-        return self.call('sendtoaddress', address, round(float(amount), 8), comment)
+    def send_to_address(self, address: str, amount: float, comment='', conf_target: int = 6) -> str:
+        return self.call('sendtoaddress', address, round(float(amount), 8),
+                         comment, '', False, False, conf_target)
 
     def get_transaction(self, txid: str):
         return self.call('gettransaction', txid)
@@ -1085,6 +1221,22 @@ class BTQRPCClient:
             return float(rate) if rate and rate > 0 else 0.0001
         except BTQRPCError:
             return 0.0001
+
+    # Wallet encryption
+    def get_wallet_info(self) -> dict:
+        return self.call('getwalletinfo')
+
+    def encrypt_wallet(self, passphrase: str):
+        return self.call('encryptwallet', passphrase)
+
+    def wallet_passphrase(self, passphrase: str, timeout: int = 300):
+        return self.call('walletpassphrase', passphrase, timeout)
+
+    def wallet_lock(self):
+        return self.call('walletlock')
+
+    def wallet_passphrase_change(self, old: str, new: str):
+        return self.call('walletpassphrasechange', old, new)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1219,8 +1371,11 @@ class WalletGUI(QMainWindow):
         self._locked = False
         self._used_addresses: set = set()
         self._last_activity = time.monotonic()
+        self._last_tx_ids: set = set()
+        self._wallet_enc_status: str = 'unencrypted'  # 'unencrypted'|'locked'|'unlocked'
         self._build_ui()
         self._setup_timer()
+        self._setup_tray()
         # Install event filter on the application to track user activity for idle lock
         QApplication.instance().installEventFilter(self)
         self._try_auto_connect()
@@ -1607,6 +1762,37 @@ class WalletGUI(QMainWindow):
         v.addWidget(self._send_bal_lbl)
         v.addSpacing(8)
 
+        # ── Fee selector ──────────────────────────────────────────────────
+        fee_box = QGroupBox(t('group_fee'))
+        fee_grid = QGridLayout(fee_box)
+        fee_grid.setSpacing(8)
+        fee_grid.setColumnStretch(1, 1)
+
+        self._fee_combo = QComboBox()
+        for key in ('fee_slow', 'fee_normal', 'fee_fast', 'fee_custom'):
+            self._fee_combo.addItem(t(key), key)
+        self._fee_combo.setCurrentIndex(1)  # Normal by default
+        self._fee_combo.currentIndexChanged.connect(self._on_fee_speed_changed)
+        fee_grid.addWidget(_lbl(t('lbl_fee_rate') if False else '', color=G['text_muted'], size=11), 0, 0)
+        fee_grid.addWidget(self._fee_combo, 0, 1, Qt.AlignLeft)
+
+        self._fee_custom_spin = QDoubleSpinBox()
+        self._fee_custom_spin.setDecimals(8)
+        self._fee_custom_spin.setRange(0.00000001, 1.0)
+        self._fee_custom_spin.setValue(0.0001)
+        self._fee_custom_spin.setSingleStep(0.00001)
+        self._fee_custom_spin.setFixedWidth(160)
+        self._fee_custom_spin.hide()
+        self._fee_custom_spin.valueChanged.connect(self._update_fee_estimate)
+        fee_grid.addWidget(_lbl(t('lbl_fee_rate'), color=G['text_muted'], size=11), 1, 0)
+        fee_grid.addWidget(self._fee_custom_spin, 1, 1, Qt.AlignLeft)
+
+        self._fee_estimate_lbl = _lbl(t('lbl_fee_estimate', fee=0.0), color=G['green_lo'], size=11, mono=True)
+        fee_grid.addWidget(self._fee_estimate_lbl, 2, 0, 1, 2)
+
+        v.addWidget(fee_box)
+        v.addSpacing(8)
+
         # ── Coin control ──────────────────────────────────────────────────
         cc_box = QGroupBox(t('group_coin_control'))
         ccv = QVBoxLayout(cc_box)
@@ -1859,6 +2045,37 @@ class WalletGUI(QMainWindow):
         ig.addWidget(btn_reset_hash, 1, 0, Qt.AlignLeft)
 
         v.addWidget(integrity_box)
+
+        # ── Wallet encryption ─────────────────────────────────────────────
+        enc_box = QGroupBox(t('group_wallet_enc'))
+        eg = QGridLayout(enc_box)
+        eg.setColumnStretch(0, 1)
+        eg.setSpacing(8)
+
+        self._enc_status_lbl = QLabel(t('wallet_enc_unencrypted'))
+        self._enc_status_lbl.setWordWrap(True)
+        self._enc_status_lbl.setStyleSheet(
+            f'color: {G["orange"]}; background: {G["surface2"]}; '
+            f'border: 1px solid {G["border2"]}; border-radius: 3px; padding: 8px; font-size: 11px;')
+        eg.addWidget(self._enc_status_lbl, 0, 0, 1, 3)
+
+        self._btn_encrypt    = _btn(t('btn_encrypt_wallet'))
+        self._btn_unlock_enc = _btn(t('btn_unlock_wallet'))
+        self._btn_lock_enc   = _btn(t('btn_lock_wallet'), obj_name='danger')
+        self._btn_chg_pass   = _btn(t('btn_change_passphrase'))
+        self._btn_encrypt.clicked.connect(self._encrypt_wallet)
+        self._btn_unlock_enc.clicked.connect(self._unlock_wallet_dlg)
+        self._btn_lock_enc.clicked.connect(self._lock_wallet_enc)
+        self._btn_chg_pass.clicked.connect(self._change_passphrase)
+        btn_enc_row = QHBoxLayout()
+        btn_enc_row.addWidget(self._btn_encrypt)
+        btn_enc_row.addWidget(self._btn_unlock_enc)
+        btn_enc_row.addWidget(self._btn_lock_enc)
+        btn_enc_row.addWidget(self._btn_chg_pass)
+        btn_enc_row.addStretch()
+        eg.addLayout(btn_enc_row, 1, 0, 1, 3)
+        v.addWidget(enc_box)
+        QTimer.singleShot(800, self._refresh_wallet_enc_ui)
 
         if hasattr(self, '_node_check_timer'):
             self._node_check_timer.stop()
@@ -2246,10 +2463,28 @@ class WalletGUI(QMainWindow):
             self._update_addresses(data['addresses'])
         if 'transactions' in data:
             self._update_transactions(data['transactions'])
+            self._check_new_incoming_tx(data['transactions'])
         if 'networkinfo' in data:
             self._update_network(data)
         if 'utxos' in data:
             self._update_utxos(data['utxos'])
+
+    def _check_new_incoming_tx(self, txs: list):
+        if not hasattr(self, '_tray'):
+            return
+        for tx in txs:
+            if tx.get('category') != 'receive':
+                continue
+            txid = tx.get('txid', '')
+            if not txid or txid in self._last_tx_ids:
+                continue
+            if self._last_tx_ids:  # don't notify on first load
+                amount = float(tx.get('amount', 0))
+                self._tray.showMessage(
+                    t('tray_new_tx'),
+                    t('tray_received', amount=amount),
+                    QSystemTrayIcon.Information, 5000)
+        self._last_tx_ids = {tx.get('txid', '') for tx in txs}
 
     def _on_rpc_error(self, msg: str):
         if 'connection' in msg.lower() or 'connect' in msg.lower():
@@ -2513,13 +2748,17 @@ class WalletGUI(QMainWindow):
         ) != QMessageBox.Yes:
             return
 
+        if not self._auto_unlock_for_send():
+            return
+
         selected = self._get_selected_utxos() if hasattr(self, '_utxo_table') else []
         if selected:
             self._send_with_coin_control(to, amount, note, selected)
             return
 
         try:
-            txid = self.rpc.send_to_address(to, amount, note)
+            conf_target = self._get_fee_conf_target()
+            txid = self.rpc.send_to_address(to, amount, note, conf_target)
             QMessageBox.information(self, t('tab_send'), t('dlg_tx_sent', txid=txid))
             self._to_addr.clear()
             self._amount.clear()
@@ -2656,7 +2895,7 @@ class WalletGUI(QMainWindow):
     def _send_with_coin_control(self, to: str, amount: float, note: str,
                                  selected_utxos: list):
         try:
-            fee_rate = self.rpc.estimate_smart_fee()
+            fee_rate = self._get_fee_rate()
             fee = max(round(fee_rate * 250 / 1000, 8), 0.0001)
             selected_total = sum(float(u['amount']) for u in selected_utxos)
             change = round(selected_total - amount - fee, 8)
@@ -2873,6 +3112,258 @@ class WalletGUI(QMainWindow):
         _save_app_settings(self._app_settings)
         self._set_status(t('settings_saved'))
 
+    # ──────────────────────────── System tray ─────────────────────────────
+
+    def _setup_tray(self):
+        if not QSystemTrayIcon.isSystemTrayAvailable():
+            return
+        self._tray = QSystemTrayIcon(self)
+        icon = QApplication.style().standardIcon(
+            QApplication.style().SP_ComputerIcon)
+        self._tray.setIcon(icon)
+        self._tray.setToolTip(t('tray_tooltip'))
+
+        menu = QMenu()
+        act_open = QAction(t('tray_open'), self)
+        act_open.triggered.connect(self._show_and_raise)
+        menu.addAction(act_open)
+        menu.addSeparator()
+        act_lock = QAction(t('tray_lock'), self)
+        act_lock.triggered.connect(self._lock)
+        menu.addAction(act_lock)
+        menu.addSeparator()
+        act_quit = QAction(t('tray_quit'), self)
+        act_quit.triggered.connect(self._quit_app)
+        menu.addAction(act_quit)
+
+        self._tray.setContextMenu(menu)
+        self._tray.activated.connect(self._on_tray_activated)
+        self._tray.show()
+
+    def _on_tray_activated(self, reason):
+        if reason == QSystemTrayIcon.DoubleClick:
+            self._show_and_raise()
+
+    def _show_and_raise(self):
+        self.showNormal()
+        self.raise_()
+        self.activateWindow()
+
+    def _quit_app(self):
+        self._do_cleanup()
+        QApplication.quit()
+
+    # ──────────────────────────── Wallet encryption ───────────────────────
+
+    def _refresh_wallet_enc_ui(self):
+        if not self._connected or not self.rpc:
+            return
+        if not hasattr(self, '_enc_status_lbl'):
+            return
+        try:
+            info = self.rpc.get_wallet_info()
+            status = info.get('encryption_status', '')
+            unlocked_until = info.get('unlocked_until', None)
+            if not status:
+                if unlocked_until is None:
+                    status = 'unencrypted'
+                elif unlocked_until == 0:
+                    status = 'locked'
+                else:
+                    status = 'unlocked'
+            self._wallet_enc_status = status
+        except (BTQRPCError, ConnectionError):
+            return
+
+        if self._wallet_enc_status == 'unencrypted':
+            self._enc_status_lbl.setText(t('wallet_enc_unencrypted'))
+            self._enc_status_lbl.setStyleSheet(
+                f'color: {G["orange"]}; background: {G["surface2"]}; '
+                f'border: 1px solid {G["border2"]}; border-radius: 3px; padding: 8px; font-size: 11px;')
+            self._btn_encrypt.show()
+            self._btn_unlock_enc.hide()
+            self._btn_lock_enc.hide()
+            self._btn_chg_pass.hide()
+        elif self._wallet_enc_status == 'locked':
+            self._enc_status_lbl.setText(t('wallet_enc_locked'))
+            self._enc_status_lbl.setStyleSheet(
+                f'color: {G["text_muted"]}; background: {G["surface2"]}; '
+                f'border: 1px solid {G["border2"]}; border-radius: 3px; padding: 8px; font-size: 11px;')
+            self._btn_encrypt.hide()
+            self._btn_unlock_enc.show()
+            self._btn_lock_enc.hide()
+            self._btn_chg_pass.show()
+        else:  # unlocked
+            self._enc_status_lbl.setText(t('wallet_enc_unlocked'))
+            self._enc_status_lbl.setStyleSheet(
+                f'color: {G["green"]}; background: {G["green_dark"]}; '
+                f'border: 1px solid {G["green_lo"]}; border-radius: 3px; padding: 8px; font-size: 11px;')
+            self._btn_encrypt.hide()
+            self._btn_unlock_enc.hide()
+            self._btn_lock_enc.show()
+            self._btn_chg_pass.show()
+
+    def _encrypt_wallet(self):
+        if not self._require_conn():
+            return
+        dlg = QDialog(self)
+        dlg.setWindowTitle(t('btn_encrypt_wallet'))
+        dlg.setMinimumWidth(340)
+        lay = QVBoxLayout(dlg)
+        lay.setSpacing(10)
+        lay.addWidget(_lbl(t('dlg_enc_passphrase'), color=G['text_muted'], size=11))
+        inp1 = QLineEdit(); inp1.setEchoMode(QLineEdit.Password)
+        lay.addWidget(inp1)
+        lay.addWidget(_lbl(t('dlg_enc_confirm'), color=G['text_muted'], size=11))
+        inp2 = QLineEdit(); inp2.setEchoMode(QLineEdit.Password)
+        lay.addWidget(inp2)
+        btns = QHBoxLayout()
+        ok = QPushButton('OK'); cancel = QPushButton(t('tray_quit').replace('Quit', 'Cancel') if False else 'Cancel')
+        ok.clicked.connect(dlg.accept); cancel.clicked.connect(dlg.reject)
+        btns.addStretch(); btns.addWidget(ok); btns.addWidget(cancel)
+        lay.addLayout(btns)
+        if dlg.exec_() != QDialog.Accepted:
+            return
+        p1, p2 = inp1.text(), inp2.text()
+        if not p1:
+            return
+        if p1 != p2:
+            QMessageBox.warning(self, t('btn_encrypt_wallet'), t('dlg_enc_mismatch'))
+            return
+        try:
+            self.rpc.encrypt_wallet(p1)
+            QMessageBox.information(self, t('btn_encrypt_wallet'), t('dlg_enc_done'))
+            self._wallet_enc_status = 'locked'
+            self._refresh_wallet_enc_ui()
+        except (BTQRPCError, ConnectionError) as e:
+            QMessageBox.critical(self, 'BTQ', str(e))
+
+    def _unlock_wallet_dlg(self, timeout: int = 0):
+        if not self._require_conn():
+            return
+        passphrase, ok = QInputDialog.getText(
+            self, t('btn_unlock_wallet'), t('dlg_enc_passphrase'),
+            QLineEdit.Password)
+        if not ok or not passphrase:
+            return
+        if timeout == 0:
+            timeout, ok2 = QInputDialog.getInt(
+                self, t('btn_unlock_wallet'), t('dlg_enc_unlock_timeout'),
+                300, 1, 86400)
+            if not ok2:
+                return
+        try:
+            self.rpc.wallet_passphrase(passphrase, timeout)
+            self._wallet_enc_status = 'unlocked'
+            self._refresh_wallet_enc_ui()
+            self._set_status(t('dlg_enc_unlocked'))
+        except (BTQRPCError, ConnectionError) as e:
+            QMessageBox.critical(self, 'BTQ', str(e))
+        return True
+
+    def _lock_wallet_enc(self):
+        if not self._require_conn():
+            return
+        try:
+            self.rpc.wallet_lock()
+            self._wallet_enc_status = 'locked'
+            self._refresh_wallet_enc_ui()
+            self._set_status(t('dlg_enc_locked_ok'))
+        except (BTQRPCError, ConnectionError) as e:
+            QMessageBox.critical(self, 'BTQ', str(e))
+
+    def _change_passphrase(self):
+        if not self._require_conn():
+            return
+        old, ok1 = QInputDialog.getText(
+            self, t('btn_change_passphrase'), t('dlg_enc_old_pass'),
+            QLineEdit.Password)
+        if not ok1 or not old:
+            return
+        new1, ok2 = QInputDialog.getText(
+            self, t('btn_change_passphrase'), t('dlg_enc_new_pass'),
+            QLineEdit.Password)
+        if not ok2 or not new1:
+            return
+        new2, ok3 = QInputDialog.getText(
+            self, t('btn_change_passphrase'), t('dlg_enc_confirm'),
+            QLineEdit.Password)
+        if not ok3:
+            return
+        if new1 != new2:
+            QMessageBox.warning(self, t('btn_change_passphrase'), t('dlg_enc_mismatch'))
+            return
+        try:
+            self.rpc.wallet_passphrase_change(old, new1)
+            QMessageBox.information(self, t('btn_change_passphrase'), t('dlg_enc_changed'))
+        except (BTQRPCError, ConnectionError) as e:
+            QMessageBox.critical(self, 'BTQ', str(e))
+
+    def _auto_unlock_for_send(self) -> bool:
+        if self._wallet_enc_status != 'locked':
+            return True
+        passphrase, ok = QInputDialog.getText(
+            self, t('btn_unlock_wallet'), t('dlg_enc_locked_send'),
+            QLineEdit.Password)
+        if not ok or not passphrase:
+            return False
+        try:
+            self.rpc.wallet_passphrase(passphrase, 60)
+            self._wallet_enc_status = 'unlocked'
+            return True
+        except (BTQRPCError, ConnectionError) as e:
+            QMessageBox.critical(self, 'BTQ', str(e))
+            return False
+
+    # ──────────────────────────── Fee selector ────────────────────────────
+
+    def _on_fee_speed_changed(self, index: int):
+        is_custom = (index == 3)
+        if hasattr(self, '_fee_custom_spin'):
+            if is_custom:
+                self._fee_custom_spin.show()
+            else:
+                self._fee_custom_spin.hide()
+        self._update_fee_estimate()
+
+    def _update_fee_estimate(self):
+        if not hasattr(self, '_fee_estimate_lbl'):
+            return
+        try:
+            amount_text = self._amount.text().strip() if hasattr(self, '_amount') else '0'
+            amount = float(amount_text) if amount_text else 0.0
+        except ValueError:
+            amount = 0.0
+
+        conf_target = self._get_fee_conf_target()
+        if self._connected and self.rpc:
+            try:
+                rate = self.rpc.estimate_smart_fee(conf_target)
+                fee = max(round(rate * 250 / 1000, 8), 0.0001)
+                self._fee_estimate_lbl.setText(t('lbl_fee_estimate', fee=fee))
+                return
+            except (BTQRPCError, ConnectionError):
+                pass
+        self._fee_estimate_lbl.setText(t('lbl_fee_estimate', fee=0.0))
+
+    def _get_fee_conf_target(self) -> int:
+        if not hasattr(self, '_fee_combo'):
+            return 6
+        idx = self._fee_combo.currentIndex()
+        return [24, 6, 2, 6][idx]
+
+    def _get_fee_rate(self) -> float:
+        if not hasattr(self, '_fee_combo'):
+            return 0.0001
+        if self._fee_combo.currentIndex() == 3 and hasattr(self, '_fee_custom_spin'):
+            return self._fee_custom_spin.value()
+        if self._connected and self.rpc:
+            try:
+                return self.rpc.estimate_smart_fee(self._get_fee_conf_target())
+            except (BTQRPCError, ConnectionError):
+                pass
+        return 0.0001
+
     # ──────────────────────────── Language & Privacy ──────────────────────
 
     def _on_lang_changed(self, index: int):
@@ -2895,6 +3386,8 @@ class WalletGUI(QMainWindow):
         btqd_val = btqd.text() if btqd else ''
         lock_mins = getattr(self, '_spin_lock_timeout', None)
         lock_mins_val = int(lock_mins.value()) if lock_mins else None
+        fee_idx = self._fee_combo.currentIndex() if hasattr(self, '_fee_combo') else 1
+        fee_custom_val = self._fee_custom_spin.value() if hasattr(self, '_fee_custom_spin') else 0.0001
         cur_tab = self.tabs.currentIndex()
 
         if hasattr(self, '_node_check_timer'):
@@ -2920,6 +3413,10 @@ class WalletGUI(QMainWindow):
             self._btqd_path.setText(btqd_val)
         if lock_mins_val is not None and hasattr(self, '_spin_lock_timeout'):
             self._spin_lock_timeout.setValue(lock_mins_val)
+        if hasattr(self, '_fee_combo'):
+            self._fee_combo.setCurrentIndex(fee_idx)
+        if hasattr(self, '_fee_custom_spin'):
+            self._fee_custom_spin.setValue(fee_custom_val)
         self.tabs.setCurrentIndex(min(cur_tab, self.tabs.count() - 1))
 
         # Restore connection status display
@@ -2956,18 +3453,26 @@ class WalletGUI(QMainWindow):
             f'{datetime.now().strftime("%H:%M:%S")}   {msg}')
 
     def closeEvent(self, event):
+        # Minimize to tray instead of quitting, if tray is available
+        if hasattr(self, '_tray') and self._tray.isVisible():
+            self.hide()
+            self._tray.showMessage(
+                'BTQ Wallet', t('tray_hidden'),
+                QSystemTrayIcon.Information, 3000)
+            event.ignore()
+            return
+        self._do_cleanup()
+        event.accept()
+
+    def _do_cleanup(self):
         if self._worker and self._worker.isRunning():
             self._worker.wait(2000)
-        # Clear clipboard so copied addresses don't linger after exit
         QApplication.clipboard().clear()
-        # Wipe RPC credentials from memory as best as Python allows
         if self.rpc:
             self.rpc.user = ''
             self.rpc.password = ''
-        # Clear PIN input field if lock overlay exists
         if hasattr(self, '_lock_pin_input'):
             self._lock_pin_input.clear()
-        event.accept()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
