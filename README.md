@@ -10,9 +10,25 @@ No accounts. No cloud. No tracking. Your keys, your coins.
 
 ## Quick Start
 
-### Option A — Standalone binary (no Python required)
+### Option A — Standalone binary *(recommended, no Python required)*
 
-Download `BTQWallet.exe` (Windows) or `BTQWallet` (Linux/macOS) from the [**Releases page**](https://github.com/adrianrozadagarcia/BTQ-Wallet/releases) and double-click it. That's it.
+Download the binary for your platform from the [**Releases page**](https://github.com/adrianrozadagarcia/BTQ-Wallet/releases/latest) and run it:
+
+| Platform | File | How to run |
+|---|---|---|
+| Windows | `BTQWallet-windows.exe` | Double-click |
+| Linux | `BTQWallet-linux` | `chmod +x BTQWallet-linux && ./BTQWallet-linux` |
+| macOS | `BTQWallet-macos` | `chmod +x BTQWallet-macos && ./BTQWallet-macos` |
+
+**One-liner (PowerShell / Windows):**
+```powershell
+irm https://github.com/adrianrozadagarcia/BTQ-Wallet/releases/latest/download/BTQWallet-windows.exe -OutFile BTQWallet.exe; Start-Process BTQWallet.exe
+```
+
+**One-liner (Linux/macOS):**
+```bash
+curl -fsSL https://github.com/adrianrozadagarcia/BTQ-Wallet/releases/latest/download/BTQWallet-linux -o BTQWallet && chmod +x BTQWallet && ./BTQWallet
+```
 
 ### Option B — Run from source
 

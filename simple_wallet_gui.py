@@ -368,7 +368,7 @@ QSpinBox::down-button, QDoubleSpinBox::down-button {{
 # Internationalisation
 # ─────────────────────────────────────────────────────────────────────────────
 
-__version__ = '1.0.0'
+__version__ = '1.2.0'
 
 _LANG = 'en'
 _LANGS = [('en', 'English'), ('es', 'Español'), ('ru', 'Русский'), ('zh', '中文')]
@@ -528,6 +528,10 @@ TRANSLATIONS: dict = {
         'tray_hidden': 'BTQ Wallet is running in the background.',
         'tray_new_tx': 'New transaction',
         'tray_received': 'Received {amount:.8f} BTQ',
+        # Update check
+        'update_available': 'New version available: {version}  —  ',
+        'update_download': 'Download',
+        'update_checking': 'Checking for updates…',
     },
     'es': {
         'tab_balance': 'BALANCE', 'tab_addresses': 'DIRECCIONES',
@@ -678,6 +682,9 @@ TRANSLATIONS: dict = {
         'tray_hidden': 'BTQ Wallet está ejecutándose en segundo plano.',
         'tray_new_tx': 'Nueva transacción',
         'tray_received': 'Recibido {amount:.8f} BTQ',
+        'update_available': 'Nueva versión disponible: {version}  —  ',
+        'update_download': 'Descargar',
+        'update_checking': 'Buscando actualizaciones…',
     },
     'ru': {
         'tab_balance': 'БАЛАНС', 'tab_addresses': 'АДРЕСА',
@@ -828,6 +835,9 @@ TRANSLATIONS: dict = {
         'tray_hidden': 'BTQ Wallet работает в фоновом режиме.',
         'tray_new_tx': 'Новая транзакция',
         'tray_received': 'Получено {amount:.8f} BTQ',
+        'update_available': 'Доступна новая версия: {version}  —  ',
+        'update_download': 'Скачать',
+        'update_checking': 'Проверка обновлений…',
     },
     'zh': {
         'tab_balance': '余额', 'tab_addresses': '地址',
@@ -978,6 +988,9 @@ TRANSLATIONS: dict = {
         'tray_hidden': 'BTQ Wallet 正在后台运行。',
         'tray_new_tx': '新交易',
         'tray_received': '收到 {amount:.8f} BTQ',
+        'update_available': '有新版本: {version}  —  ',
+        'update_download': '下载',
+        'update_checking': '检查更新中…',
     },
 }
 
@@ -1243,6 +1256,20 @@ class BTQRPCClient:
 # Worker RPC (hilo separado para no bloquear la GUI)
 # ─────────────────────────────────────────────────────────────────────────────
 
+class _UpdateWorker(QThread):
+    result = pyqtSignal(str)
+
+    def run(self):
+        try:
+            url = 'https://api.github.com/repos/adrianrozadagarcia/BTQ-Wallet/releases/latest'
+            req = Request(url, headers={'User-Agent': f'BTQWallet/{__version__}'})
+            with urlopen(req, timeout=8) as resp:
+                data = json.loads(resp.read())
+            self.result.emit(data.get('tag_name', ''))
+        except Exception:
+            self.result.emit('')
+
+
 class RPCWorker(QThread):
     data_ready  = pyqtSignal(dict)
     rpc_error   = pyqtSignal(str)
@@ -1376,6 +1403,7 @@ class WalletGUI(QMainWindow):
         self._build_ui()
         self._setup_timer()
         self._setup_tray()
+        QTimer.singleShot(3000, self._check_for_update)
         # Install event filter on the application to track user activity for idle lock
         QApplication.instance().installEventFilter(self)
         self._try_auto_connect()
@@ -1398,6 +1426,26 @@ class WalletGUI(QMainWindow):
 
         vbox.addWidget(self._build_header())
         vbox.addWidget(_sep())
+
+        # Update banner — hidden until a new version is found
+        self._update_banner = QWidget()
+        self._update_banner.setStyleSheet(
+            f'background: {G["orange"]}; padding: 0px;')
+        banner_h = QHBoxLayout(self._update_banner)
+        banner_h.setContentsMargins(12, 4, 12, 4)
+        self._update_lbl = QLabel('')
+        self._update_lbl.setStyleSheet('color: #000; font-size: 12px; font-weight: bold; background: transparent;')
+        self._update_link = QPushButton(t('update_download'))
+        self._update_link.setStyleSheet(
+            'color: #000; background: transparent; border: 1px solid #000; '
+            'border-radius: 3px; padding: 2px 10px; font-weight: bold; font-size: 12px;')
+        self._update_link.setCursor(Qt.PointingHandCursor)
+        self._update_link.clicked.connect(self._open_releases_page)
+        banner_h.addWidget(self._update_lbl)
+        banner_h.addWidget(self._update_link)
+        banner_h.addStretch()
+        self._update_banner.hide()
+        vbox.addWidget(self._update_banner)
 
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
@@ -3139,6 +3187,29 @@ class WalletGUI(QMainWindow):
         self._tray.setContextMenu(menu)
         self._tray.activated.connect(self._on_tray_activated)
         self._tray.show()
+
+    # ──────────────────────────── Auto-update ─────────────────────────────
+
+    def _check_for_update(self):
+        worker = _UpdateWorker()
+        worker.result.connect(self._on_update_result)
+        worker.setParent(self)
+        worker.start()
+
+    def _on_update_result(self, latest: str):
+        if not latest:
+            return
+        try:
+            def _parse(v): return tuple(int(x) for x in v.lstrip('v').split('.')[:3])
+            if _parse(latest) > _parse(__version__):
+                self._update_lbl.setText(t('update_available', version=latest))
+                self._update_banner.show()
+        except ValueError:
+            pass
+
+    def _open_releases_page(self):
+        import webbrowser
+        webbrowser.open('https://github.com/adrianrozadagarcia/BTQ-Wallet/releases')
 
     def _on_tray_activated(self, reason):
         if reason == QSystemTrayIcon.DoubleClick:
