@@ -17,6 +17,7 @@ from urllib.error import URLError, HTTPError
 import hashlib
 import secrets
 import time
+import platform
 
 if sys.stdout.encoding != 'utf-8':
     try:
@@ -55,6 +56,24 @@ try:
     CRYPTO_AVAILABLE = True
 except ImportError:
     CRYPTO_AVAILABLE = False
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Platform detection
+# ─────────────────────────────────────────────────────────────────────────────
+
+_SYS     = platform.system()          # 'Windows' | 'Linux' | 'Darwin'
+_IS_WIN  = _SYS == 'Windows'
+_BTQD_BIN = 'btqd.exe' if _IS_WIN else 'btqd'
+
+
+def _default_datadir() -> str:
+    if _IS_WIN:
+        return os.path.join(os.environ.get('APPDATA', ''), 'BTQ')
+    elif _SYS == 'Darwin':
+        return os.path.expanduser('~/Library/Application Support/BTQ')
+    else:
+        return os.path.expanduser('~/.btq')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -457,6 +476,21 @@ TRANSLATIONS: dict = {
         'node_hash_reset_done': 'Hash reset — new hash recorded on next launch.',
         'group_node_integrity': 'NODE INTEGRITY',
         'addr_reuse_warning': 'This address was used before. Ask for a fresh address.',
+        'group_tor': 'TOR NETWORK',
+        'lbl_use_tor': 'Route node traffic through Tor',
+        'lbl_tor_proxy': 'Tor proxy (host:port)',
+        'tor_reachable': 'Tor reachable',
+        'tor_unreachable': 'Tor not reachable at {proxy}',
+        'tor_checking': 'Checking Tor...',
+        'group_coin_control': 'COIN CONTROL',
+        'coin_control_hint': 'Select UTXOs to spend. Leave all unchecked to let the node choose automatically.',
+        'btn_load_utxos': 'Refresh UTXOs',
+        'btn_select_all': 'Select All',
+        'btn_deselect_all': 'Deselect',
+        'lbl_selected_utxos': 'Selected: {amount:.8f} BTQ  ({count} UTXO)',
+        'lbl_no_utxos': 'No UTXOs — connect and refresh',
+        'coin_control_insufficient': 'Selected UTXOs insufficient.\nSelected: {selected:.8f}\nNeeded: ~{needed:.8f} BTQ',
+        'dlg_coin_control_send': 'Send {amount:.8f} BTQ to:\n{addr}\n\nInputs:  {selected:.8f} BTQ\nFee:     {fee:.8f} BTQ\nChange:  {change:.8f} BTQ',
         'settings_saved': 'Settings saved',
     },
     'es': {
@@ -559,6 +593,21 @@ TRANSLATIONS: dict = {
         'node_hash_reset_done': 'Hash restablecido — se registrará en el próximo inicio.',
         'group_node_integrity': 'INTEGRIDAD DEL NODO',
         'addr_reuse_warning': 'Esta dirección ya fue usada. Solicita una dirección nueva.',
+        'group_tor': 'RED TOR',
+        'lbl_use_tor': 'Enrutar tráfico del nodo por Tor',
+        'lbl_tor_proxy': 'Proxy Tor (host:puerto)',
+        'tor_reachable': 'Tor accesible',
+        'tor_unreachable': 'Tor no accesible en {proxy}',
+        'tor_checking': 'Verificando Tor...',
+        'group_coin_control': 'COIN CONTROL',
+        'coin_control_hint': 'Selecciona UTXOs a gastar. Sin selección, el nodo elige automáticamente.',
+        'btn_load_utxos': 'Actualizar UTXOs',
+        'btn_select_all': 'Seleccionar todo',
+        'btn_deselect_all': 'Deseleccionar',
+        'lbl_selected_utxos': 'Seleccionado: {amount:.8f} BTQ  ({count} UTXO)',
+        'lbl_no_utxos': 'Sin UTXOs — conecta y actualiza',
+        'coin_control_insufficient': 'UTXOs insuficientes.\nSeleccionado: {selected:.8f}\nNecesario: ~{needed:.8f} BTQ',
+        'dlg_coin_control_send': 'Enviar {amount:.8f} BTQ a:\n{addr}\n\nEntradas: {selected:.8f} BTQ\nComisión: {fee:.8f} BTQ\nCambio:   {change:.8f} BTQ',
         'settings_saved': 'Configuración guardada',
     },
     'ru': {
@@ -661,6 +710,21 @@ TRANSLATIONS: dict = {
         'node_hash_reset_done': 'Хеш сброшен — новый будет записан при следующем запуске.',
         'group_node_integrity': 'ЦЕЛОСТНОСТЬ УЗЛА',
         'addr_reuse_warning': 'Этот адрес уже использовался. Запросите новый адрес.',
+        'group_tor': 'СЕТЬ TOR',
+        'lbl_use_tor': 'Направить трафик узла через Tor',
+        'lbl_tor_proxy': 'Прокси Tor (хост:порт)',
+        'tor_reachable': 'Tor доступен',
+        'tor_unreachable': 'Tor недоступен по {proxy}',
+        'tor_checking': 'Проверка Tor...',
+        'group_coin_control': 'COIN CONTROL',
+        'coin_control_hint': 'Выберите UTXOs для трат. Без выбора — узел определит автоматически.',
+        'btn_load_utxos': 'Обновить UTXOs',
+        'btn_select_all': 'Выбрать все',
+        'btn_deselect_all': 'Снять выбор',
+        'lbl_selected_utxos': 'Выбрано: {amount:.8f} BTQ  ({count} UTXO)',
+        'lbl_no_utxos': 'Нет UTXOs — подключитесь и обновите',
+        'coin_control_insufficient': 'Недостаточно UTXOs.\nВыбрано: {selected:.8f}\nНужно: ~{needed:.8f} BTQ',
+        'dlg_coin_control_send': 'Отправить {amount:.8f} BTQ на:\n{addr}\n\nВходы:    {selected:.8f} BTQ\nКомиссия: {fee:.8f} BTQ\nСдача:    {change:.8f} BTQ',
         'settings_saved': 'Настройки сохранены',
     },
     'zh': {
@@ -763,6 +827,21 @@ TRANSLATIONS: dict = {
         'node_hash_reset_done': '哈希已重置 — 下次启动时记录新哈希。',
         'group_node_integrity': '节点完整性',
         'addr_reuse_warning': '此地址之前已使用过。建议请求新地址。',
+        'group_tor': 'TOR网络',
+        'lbl_use_tor': '通过Tor路由节点流量',
+        'lbl_tor_proxy': 'Tor代理（主机:端口）',
+        'tor_reachable': 'Tor可连接',
+        'tor_unreachable': '{proxy} 处Tor不可连接',
+        'tor_checking': '检查Tor中...',
+        'group_coin_control': 'COIN CONTROL',
+        'coin_control_hint': '选择要使用的UTXO。不选则由节点自动选择。',
+        'btn_load_utxos': '刷新UTXO',
+        'btn_select_all': '全选',
+        'btn_deselect_all': '取消选择',
+        'lbl_selected_utxos': '已选: {amount:.8f} BTQ  ({count} UTXO)',
+        'lbl_no_utxos': '无UTXO — 请连接并刷新',
+        'coin_control_insufficient': 'UTXO不足。\n已选: {selected:.8f}\n需要: ~{needed:.8f} BTQ',
+        'dlg_coin_control_send': '发送 {amount:.8f} BTQ 到:\n{addr}\n\n输入:  {selected:.8f} BTQ\n手续费: {fee:.8f} BTQ\n找零:  {change:.8f} BTQ',
         'settings_saved': '设置已保存',
     },
 }
@@ -780,6 +859,7 @@ def _load_app_settings() -> dict:
         'language': 'en', 'hide_balance': False,
         'clipboard_clear_seconds': 30, 'confirm_threshold_btq': 0.0,
         'pin_hash': '', 'lock_timeout_minutes': 5, 'btqd_sha256': '',
+        'use_tor': False, 'tor_proxy': '127.0.0.1:9050',
     }
     try:
         with open(_SETTINGS_PATH, encoding='utf-8') as f:
@@ -794,14 +874,17 @@ def _save_app_settings(settings: dict):
     try:
         with open(_SETTINGS_PATH, 'w', encoding='utf-8') as f:
             json.dump(settings, f, indent=2)
-        # Restrict file to current user only (Windows NTFS)
+        # Restrict file to current user only
         try:
-            import getpass
-            user = getpass.getuser()
-            subprocess.run(
-                ['icacls', _SETTINGS_PATH, '/inheritance:r', '/grant:r', f'{user}:RW'],
-                capture_output=True, creationflags=0x08000000, timeout=5
-            )
+            if _IS_WIN:
+                import getpass
+                user = getpass.getuser()
+                subprocess.run(
+                    ['icacls', _SETTINGS_PATH, '/inheritance:r', '/grant:r', f'{user}:RW'],
+                    capture_output=True, creationflags=0x08000000, timeout=5
+                )
+            else:
+                os.chmod(_SETTINGS_PATH, 0o600)
         except Exception:
             pass
     except OSError:
@@ -979,6 +1062,30 @@ class BTQRPCClient:
     def dump_wallet(self, path: str):     self.call('dumpwallet', path)
     def import_wallet(self, path: str):   self.call('importwallet', path)
 
+    # Coin control
+    def list_unspent(self, min_conf=0):
+        return self.call('listunspent', min_conf)
+
+    def get_raw_change_address(self) -> str:
+        return self.call('getrawchangeaddress')
+
+    def create_raw_transaction(self, inputs: list, outputs: dict) -> str:
+        return self.call('createrawtransaction', inputs, outputs)
+
+    def sign_raw_transaction(self, hex_tx: str) -> dict:
+        return self.call('signrawtransactionwithwallet', hex_tx)
+
+    def send_raw_transaction(self, hex_tx: str) -> str:
+        return self.call('sendrawtransaction', hex_tx)
+
+    def estimate_smart_fee(self, conf_target: int = 6) -> float:
+        try:
+            result = self.call('estimatesmartfee', conf_target)
+            rate = result.get('feerate', 0.0)
+            return float(rate) if rate and rate > 0 else 0.0001
+        except BTQRPCError:
+            return 0.0001
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Worker RPC (hilo separado para no bloquear la GUI)
@@ -1008,6 +1115,8 @@ class RPCWorker(QThread):
             if 'network' in self.tasks:
                 result['networkinfo']  = self.rpc.get_network_info()
                 result['mininginfo']   = self.rpc.get_mining_info()
+            if 'utxos' in self.tasks:
+                result['utxos'] = self.rpc.list_unspent()
             self.data_ready.emit(result)
         except (BTQRPCError, ConnectionError) as e:
             self.rpc_error.emit(str(e))
@@ -1496,7 +1605,52 @@ class WalletGUI(QMainWindow):
 
         self._send_bal_lbl = _lbl(t('available_balance', amount=0.0), color=G['text_muted'], size=11)
         v.addWidget(self._send_bal_lbl)
-        v.addSpacing(4)
+        v.addSpacing(8)
+
+        # ── Coin control ──────────────────────────────────────────────────
+        cc_box = QGroupBox(t('group_coin_control'))
+        ccv = QVBoxLayout(cc_box)
+        ccv.setSpacing(6)
+
+        cc_hint = _lbl(t('coin_control_hint'), color=G['text_muted'], size=10)
+        cc_hint.setWordWrap(True)
+        ccv.addWidget(cc_hint)
+
+        self._utxo_table = QTableWidget()
+        self._utxo_table.setColumnCount(4)
+        self._utxo_table.setHorizontalHeaderLabels([
+            '', t('col_address'), t('col_amount'), t('col_conf')])
+        self._utxo_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
+        self._utxo_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self._utxo_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self._utxo_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self._utxo_table.setColumnWidth(0, 28)
+        self._utxo_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self._utxo_table.setSelectionMode(QAbstractItemView.NoSelection)
+        self._utxo_table.setAlternatingRowColors(True)
+        self._utxo_table.verticalHeader().setVisible(False)
+        self._utxo_table.setMaximumHeight(160)
+        ccv.addWidget(self._utxo_table)
+
+        cc_toolbar = QHBoxLayout()
+        btn_load_utxos  = _btn(t('btn_load_utxos'))
+        btn_select_all  = _btn(t('btn_select_all'))
+        btn_deselect    = _btn(t('btn_deselect_all'))
+        btn_load_utxos.clicked.connect(lambda: self._start_worker(['utxos']))
+        btn_select_all.clicked.connect(self._utxo_select_all)
+        btn_deselect.clicked.connect(self._utxo_deselect_all)
+        cc_toolbar.addWidget(btn_load_utxos)
+        cc_toolbar.addWidget(btn_select_all)
+        cc_toolbar.addWidget(btn_deselect)
+        cc_toolbar.addStretch()
+        self._utxo_selected_lbl = _lbl(
+            t('lbl_selected_utxos', amount=0.0, count=0),
+            color=G['green_lo'], size=11, mono=True)
+        cc_toolbar.addWidget(self._utxo_selected_lbl)
+        ccv.addLayout(cc_toolbar)
+
+        v.addWidget(cc_box)
+        v.addSpacing(8)
 
         btn_send = _btn(t('btn_send_tx'), obj_name='primary')
         btn_send.setMinimumHeight(42)
@@ -1786,6 +1940,30 @@ class WalletGUI(QMainWindow):
 
         v.addWidget(lock_box)
 
+        # ── Tor network ───────────────────────────────────────────────────
+        tor_box = QGroupBox(t('group_tor'))
+        tg = QGridLayout(tor_box)
+        tg.setColumnStretch(1, 1)
+        tg.setSpacing(10)
+
+        self._chk_tor = QCheckBox(t('lbl_use_tor'))
+        self._chk_tor.setChecked(self._app_settings.get('use_tor', False))
+        self._chk_tor.stateChanged.connect(self._on_tor_changed)
+        tg.addWidget(self._chk_tor, 0, 0, 1, 2)
+
+        tg.addWidget(_lbl(t('lbl_tor_proxy'), color=G['text_muted'], size=11), 1, 0)
+        self._tor_proxy_field = QLineEdit()
+        self._tor_proxy_field.setText(self._app_settings.get('tor_proxy', '127.0.0.1:9050'))
+        self._tor_proxy_field.setFixedWidth(200)
+        self._tor_proxy_field.editingFinished.connect(self._save_tor_settings)
+        tg.addWidget(self._tor_proxy_field, 1, 1, Qt.AlignLeft)
+
+        self._tor_status_lbl = QLabel('')
+        self._tor_status_lbl.setStyleSheet(f'color: {G["text_muted"]}; font-size: 11px;')
+        tg.addWidget(self._tor_status_lbl, 2, 0, 1, 2)
+
+        v.addWidget(tor_box)
+
         # ── btq.conf help ─────────────────────────────────────────────────
         help_box = QGroupBox(t('group_btqconf'))
         hv = QVBoxLayout(help_box)
@@ -1874,7 +2052,7 @@ class WalletGUI(QMainWindow):
                 f'color: {G["green"]}; background: {G["green_dark"]}; '
                 f'border: 1px solid {G["green_lo"]}; border-radius: 3px; padding: 8px;')
             self._set_status(t('status_connected', chain=chain, blocks=blocks))
-            self._start_worker(['balance', 'addresses', 'transactions', 'network'])
+            self._start_worker(['balance', 'addresses', 'transactions', 'network', 'utxos'])
         except (ConnectionError, BTQRPCError) as e:
             self._connected = False
             self.rpc = None
@@ -1903,17 +2081,22 @@ class WalletGUI(QMainWindow):
 
     @staticmethod
     def _find_btqd() -> str:
-        """Try to locate btqd.exe in common locations."""
         desktop = os.path.join(os.path.expanduser('~'), 'Desktop')
         try:
             for entry in os.listdir(desktop):
                 full = os.path.join(desktop, entry)
                 if os.path.isdir(full):
-                    candidate = os.path.join(full, 'btqd.exe')
+                    candidate = os.path.join(full, _BTQD_BIN)
                     if os.path.exists(candidate):
                         return candidate
         except OSError:
             pass
+        if not _IS_WIN:
+            for path in ['/usr/local/bin/btqd', '/usr/bin/btqd',
+                         os.path.expanduser('~/btqd'),
+                         os.path.expanduser('~/.local/bin/btqd')]:
+                if os.path.exists(path):
+                    return path
         return ''
 
     def _browse_btqd(self):
@@ -1923,11 +2106,15 @@ class WalletGUI(QMainWindow):
 
     def _check_node_running(self):
         try:
-            out = subprocess.check_output(
-                ['tasklist', '/FI', 'IMAGENAME eq btqd.exe', '/NH'],
-                stderr=subprocess.DEVNULL, creationflags=0x08000000
-            ).decode(errors='replace')
-            running = 'btqd.exe' in out
+            if _IS_WIN:
+                out = subprocess.check_output(
+                    ['tasklist', '/FI', f'IMAGENAME eq {_BTQD_BIN}', '/NH'],
+                    stderr=subprocess.DEVNULL, creationflags=0x08000000
+                ).decode(errors='replace')
+                running = _BTQD_BIN in out
+            else:
+                result = subprocess.run(['pgrep', '-x', 'btqd'], capture_output=True)
+                running = result.returncode == 0
         except Exception:
             running = False
 
@@ -1944,7 +2131,8 @@ class WalletGUI(QMainWindow):
 
     @staticmethod
     def _unblock_file(path: str):
-        """Remove Zone.Identifier ADS so Windows doesn't block the exe."""
+        if not _IS_WIN:
+            return
         zone_id = path + ':Zone.Identifier'
         try:
             if os.path.exists(zone_id):
@@ -1985,12 +2173,22 @@ class WalletGUI(QMainWindow):
         except OSError:
             pass
         self._unblock_file(btqd)
-        datadir = os.path.join(os.environ.get('APPDATA', ''), 'BTQ')
+        datadir = _default_datadir()
+        tor_proxy = self._app_settings.get('tor_proxy', '127.0.0.1:9050') \
+                    if self._app_settings.get('use_tor') else None
+        args = [btqd, '-testnet', f'-datadir={datadir}']
+        if _IS_WIN:
+            args.append('-nodaemon')
+        if tor_proxy:
+            args.append(f'-proxy={tor_proxy}')
+            args.append('-onlynet=onion')
+        popen_kwargs = {}
+        if _IS_WIN:
+            popen_kwargs['creationflags'] = 0x08000008
+        else:
+            popen_kwargs['start_new_session'] = True
         try:
-            subprocess.Popen(
-                [btqd, '-testnet', '-nodaemon', f'-datadir={datadir}'],
-                creationflags=0x08000008,  # CREATE_NO_WINDOW | DETACHED_PROCESS
-            )
+            subprocess.Popen(args, **popen_kwargs)
             self._node_status.setText(t('node_starting'))
             self._node_status.setStyleSheet(
                 f'color: {G["orange"]}; background: {G["surface2"]}; '
@@ -2005,10 +2203,11 @@ class WalletGUI(QMainWindow):
 
     def _stop_node(self):
         try:
-            subprocess.run(
-                ['taskkill', '/F', '/IM', 'btqd.exe'],
-                capture_output=True, creationflags=0x08000000
-            )
+            if _IS_WIN:
+                subprocess.run(['taskkill', '/F', '/IM', _BTQD_BIN],
+                               capture_output=True, creationflags=0x08000000)
+            else:
+                subprocess.run(['pkill', '-x', 'btqd'], capture_output=True)
             QTimer.singleShot(1500, self._check_node_running)
             self._disconnect()
         except Exception as e:
@@ -2049,6 +2248,8 @@ class WalletGUI(QMainWindow):
             self._update_transactions(data['transactions'])
         if 'networkinfo' in data:
             self._update_network(data)
+        if 'utxos' in data:
+            self._update_utxos(data['utxos'])
 
     def _on_rpc_error(self, msg: str):
         if 'connection' in msg.lower() or 'connect' in msg.lower():
@@ -2058,7 +2259,7 @@ class WalletGUI(QMainWindow):
 
     def _auto_refresh(self):
         if self._connected:
-            self._start_worker(['balance', 'addresses', 'transactions', 'network'])
+            self._start_worker(['balance', 'addresses', 'transactions', 'network', 'utxos'])
 
     # ──────────────────────────── Actualización datos ─────────────────────
 
@@ -2312,6 +2513,11 @@ class WalletGUI(QMainWindow):
         ) != QMessageBox.Yes:
             return
 
+        selected = self._get_selected_utxos() if hasattr(self, '_utxo_table') else []
+        if selected:
+            self._send_with_coin_control(to, amount, note, selected)
+            return
+
         try:
             txid = self.rpc.send_to_address(to, amount, note)
             QMessageBox.information(self, t('tab_send'), t('dlg_tx_sent', txid=txid))
@@ -2374,6 +2580,162 @@ class WalletGUI(QMainWindow):
             self._set_status(t('status_keys_imported'))
         except (BTQRPCError, ConnectionError) as e:
             QMessageBox.critical(self, 'BTQ', str(e))
+
+    # ──────────────────────────── Coin control ────────────────────────────
+
+    def _update_utxos(self, utxos: list):
+        if not hasattr(self, '_utxo_table'):
+            return
+        self._utxo_table.setRowCount(len(utxos))
+        for row, u in enumerate(utxos):
+            chk = QCheckBox()
+            chk.stateChanged.connect(self._on_coin_control_changed)
+            cell = QWidget()
+            cell_lay = QHBoxLayout(cell)
+            cell_lay.setContentsMargins(4, 0, 0, 0)
+            cell_lay.addWidget(chk)
+            self._utxo_table.setCellWidget(row, 0, cell)
+
+            addr = u.get('address', '—')
+            self._utxo_table.setItem(row, 1, QTableWidgetItem(addr))
+
+            amt = float(u.get('amount', 0))
+            amt_item = QTableWidgetItem(f'{amt:.8f}')
+            amt_item.setForeground(QColor(G['green']))
+            self._utxo_table.setItem(row, 2, amt_item)
+
+            confs = u.get('confirmations', 0)
+            conf_item = QTableWidgetItem(str(confs))
+            conf_item.setForeground(
+                QColor(G['green']) if confs >= 6 else QColor(G['orange']))
+            self._utxo_table.setItem(row, 3, conf_item)
+
+            # store full utxo data in the row
+            self._utxo_table.item(row, 1).setData(Qt.UserRole, u)
+        self._on_coin_control_changed()
+
+    def _on_coin_control_changed(self):
+        if not hasattr(self, '_utxo_table'):
+            return
+        total, count = 0.0, 0
+        for row in range(self._utxo_table.rowCount()):
+            cell = self._utxo_table.cellWidget(row, 0)
+            if cell and cell.findChild(QCheckBox).isChecked():
+                amt_item = self._utxo_table.item(row, 2)
+                if amt_item:
+                    total += float(amt_item.text())
+                    count += 1
+        if hasattr(self, '_utxo_selected_lbl'):
+            self._utxo_selected_lbl.setText(
+                t('lbl_selected_utxos', amount=total, count=count))
+
+    def _utxo_select_all(self):
+        for row in range(self._utxo_table.rowCount()):
+            cell = self._utxo_table.cellWidget(row, 0)
+            if cell:
+                cell.findChild(QCheckBox).setChecked(True)
+
+    def _utxo_deselect_all(self):
+        for row in range(self._utxo_table.rowCount()):
+            cell = self._utxo_table.cellWidget(row, 0)
+            if cell:
+                cell.findChild(QCheckBox).setChecked(False)
+
+    def _get_selected_utxos(self) -> list:
+        selected = []
+        for row in range(self._utxo_table.rowCount()):
+            cell = self._utxo_table.cellWidget(row, 0)
+            if cell and cell.findChild(QCheckBox).isChecked():
+                item = self._utxo_table.item(row, 1)
+                if item:
+                    utxo = item.data(Qt.UserRole)
+                    if utxo:
+                        selected.append(utxo)
+        return selected
+
+    def _send_with_coin_control(self, to: str, amount: float, note: str,
+                                 selected_utxos: list):
+        try:
+            fee_rate = self.rpc.estimate_smart_fee()
+            fee = max(round(fee_rate * 250 / 1000, 8), 0.0001)
+            selected_total = sum(float(u['amount']) for u in selected_utxos)
+            change = round(selected_total - amount - fee, 8)
+
+            if change < 0:
+                QMessageBox.warning(self, 'BTQ',
+                    t('coin_control_insufficient',
+                      selected=selected_total, needed=amount + fee))
+                return
+
+            if QMessageBox.question(
+                self, t('tab_send'),
+                t('dlg_coin_control_send', amount=amount, addr=to,
+                  selected=selected_total, fee=fee,
+                  change=change if change > 0 else 0.0),
+                QMessageBox.Yes | QMessageBox.No
+            ) != QMessageBox.Yes:
+                return
+
+            inputs = [{'txid': u['txid'], 'vout': u['vout']}
+                      for u in selected_utxos]
+            outputs = {to: round(amount, 8)}
+            if change >= 0.00001:
+                change_addr = self.rpc.get_raw_change_address()
+                outputs[change_addr] = change
+
+            raw = self.rpc.create_raw_transaction(inputs, outputs)
+            signed = self.rpc.sign_raw_transaction(raw)
+            if not signed.get('complete', False):
+                QMessageBox.critical(self, 'BTQ', 'Transaction signing incomplete.')
+                return
+            txid = self.rpc.send_raw_transaction(signed['hex'])
+            QMessageBox.information(self, t('tab_send'), t('dlg_tx_sent', txid=txid))
+            self._to_addr.clear()
+            self._amount.clear()
+            self._send_note.clear()
+            self._utxo_deselect_all()
+            self._start_worker(['balance', 'transactions', 'utxos'])
+            self._set_status(f'TX: {txid[:20]}…')
+        except (BTQRPCError, ConnectionError) as e:
+            QMessageBox.critical(self, 'BTQ', str(e))
+
+    # ──────────────────────────── Tor ─────────────────────────────────────
+
+    def _on_tor_changed(self, state: int):
+        use_tor = bool(state)
+        self._app_settings['use_tor'] = use_tor
+        _save_app_settings(self._app_settings)
+        if use_tor:
+            self._check_tor()
+        else:
+            if hasattr(self, '_tor_status_lbl'):
+                self._tor_status_lbl.setText('')
+
+    def _save_tor_settings(self):
+        proxy = self._tor_proxy_field.text().strip() or '127.0.0.1:9050'
+        self._app_settings['tor_proxy'] = proxy
+        _save_app_settings(self._app_settings)
+        if self._app_settings.get('use_tor'):
+            self._check_tor()
+
+    def _check_tor(self):
+        import socket
+        proxy = self._app_settings.get('tor_proxy', '127.0.0.1:9050')
+        if hasattr(self, '_tor_status_lbl'):
+            self._tor_status_lbl.setText(t('tor_checking'))
+        try:
+            host, port_str = proxy.rsplit(':', 1)
+            sock = socket.create_connection((host, int(port_str)), timeout=3)
+            sock.close()
+            if hasattr(self, '_tor_status_lbl'):
+                self._tor_status_lbl.setText(t('tor_reachable'))
+                self._tor_status_lbl.setStyleSheet(
+                    f'color: {G["green"]}; font-size: 11px;')
+        except Exception:
+            if hasattr(self, '_tor_status_lbl'):
+                self._tor_status_lbl.setText(t('tor_unreachable', proxy=proxy))
+                self._tor_status_lbl.setStyleSheet(
+                    f'color: {G["red"]}; font-size: 11px;')
 
     # ──────────────────────────── Encrypted backup ────────────────────────
 
