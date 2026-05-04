@@ -2236,7 +2236,7 @@ class WalletGUI(QMainWindow):
         btn_sign     = _btn(t('btn_sign'), obj_name='primary')
         btn_copy_sig = _btn(t('btn_copy_sig'))
         btn_sign.clicked.connect(self._sign_message)
-        btn_copy_sig.clicked.connect(lambda: self._copy_to_clipboard(self._sign_result.text()))
+        btn_copy_sig.clicked.connect(lambda: self._copy(self._sign_result.text()))
         sign_btn_row.addWidget(btn_sign)
         sign_btn_row.addWidget(btn_copy_sig)
         sign_btn_row.addStretch()
@@ -3575,8 +3575,7 @@ class WalletGUI(QMainWindow):
 
     # ──────────────────────────── System tray ─────────────────────────────
 
-    def _maybe_create_shortcut(self):
-        pass  # shortcut creation moved to _create_shortcut_if_needed() in main()
+
 
     def _create_desktop_shortcut(self):
         import tempfile
