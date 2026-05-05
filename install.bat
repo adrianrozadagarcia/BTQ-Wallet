@@ -32,7 +32,7 @@ echo  [OK] Dependencies installed.
 
 REM Shortcut — run the app briefly to trigger shortcut creation, then exit
 echo  Creating desktop shortcut...
-.venv\Scripts\python.exe -c "import platform_utils, json, os; s={}; platform_utils.create_shortcut(os.path.abspath('simple_wallet_gui.py'), os.path.abspath('.venv/Scripts/python.exe'), os.path.abspath('btq_wallet.png'), s, lambda x: None)"
+.venv\Scripts\python.exe -c "import sys, os; sys.path.insert(0, os.path.abspath('src')); import platform_utils; s={}; platform_utils.create_shortcut(os.path.abspath('src/simple_wallet_gui.py'), os.path.abspath('.venv/Scripts/python.exe'), os.path.abspath('assets/btq_wallet.png'), s, lambda x: None)"
 echo  [OK] Setup complete.
 
 echo.

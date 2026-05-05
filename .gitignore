@@ -38,3 +38,9 @@ build/
 *.spec.bak
 __pycache__/BTQWallet/
 
+# Debug / temp files
+_sc_debug.txt
+test2_*.txt
+wallet_cache.json
+simple_wallet.json
+btq_wallet_settings.json

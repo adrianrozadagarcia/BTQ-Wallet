@@ -108,9 +108,9 @@ rpcpassword=yourpassword
 rpcallowip=127.0.0.1
 ```
 
-**Windows:** use **Settings → BTQ Node → Start Node** or run `start_node.bat`.
+**Windows:** use **Settings → BTQ Node → Start Node** or run `scripts\start_node.bat`.
 
-**Linux / macOS:** place `btqd` next to the wallet (or in `~/.local/bin/`), make it executable (`chmod +x btqd`), then use **Settings → BTQ Node → Start Node** or run `./start_node.sh`.
+**Linux / macOS:** place `btqd` next to the wallet (or in `~/.local/bin/`), make it executable (`chmod +x btqd`), then use **Settings → BTQ Node → Start Node** or run `./scripts/start_node.sh`.
 
 > **Windows note:** downloaded executables may be blocked by SmartScreen. The wallet handles this automatically (`Unblock-File`) on first launch.  
 > **Linux note:** if `btqd` was downloaded (not installed via package manager), run `chmod +x btqd` before first use.
@@ -222,13 +222,13 @@ To build a standalone binary yourself:
 
 ```bat
 REM Windows
-build.bat
+scripts\build.bat
 REM Output: dist\BTQWallet.exe
 ```
 
 ```bash
 # Linux / macOS
-chmod +x build.sh && ./build.sh
+chmod +x scripts/build.sh && ./scripts/build.sh
 # Output: dist/BTQWallet
 ```
 

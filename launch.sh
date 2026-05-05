@@ -67,7 +67,7 @@ echo ""
 echo " Opening BTQ Wallet..."
 echo ""
 set +e
-"$VENV_PYTHON" "$SCRIPT_DIR/simple_wallet_gui.py"
+"$VENV_PYTHON" "$SCRIPT_DIR/src/simple_wallet_gui.py"
 EXIT_CODE=$?
 set -e
 

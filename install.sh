@@ -86,23 +86,23 @@ echo " Creating desktop shortcut..."
 # Resolve the best icon available (prefer PNG)
 ICON=""
 for ext in png ico jpg jpeg; do
-    f="$SCRIPT_DIR/btq_wallet.$ext"
+    f="$SCRIPT_DIR/assets/btq_wallet.$ext"
     if [ -f "$f" ]; then ICON="$f"; break; fi
 done
-[ -z "$ICON" ] && ICON="$SCRIPT_DIR/btq_wallet.png"  # fallback (may not exist)
+[ -z "$ICON" ] && ICON="$SCRIPT_DIR/assets/btq_wallet.png"  # fallback (may not exist)
 
 # Run shortcut creation via the venv Python so platform_utils is available
 set +e
 "$VENV_PY" - <<PYEOF
 import sys, os
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$SCRIPT_DIR/src')
 import platform_utils
 
 def _save(s):
     pass  # install.sh does not persist settings; the app does on first launch
 
 platform_utils.create_shortcut(
-    script_path      = '$SCRIPT_DIR/simple_wallet_gui.py',
+    script_path      = '$SCRIPT_DIR/src/simple_wallet_gui.py',
     python_path      = '$SCRIPT_DIR/.venv/bin/python',
     icon_path        = '$ICON',
     settings         = {},

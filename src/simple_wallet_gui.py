@@ -1556,12 +1556,14 @@ def _stat_row(layout, row, label_text, value_text='—', value_color=None):
 
 def _make_app_icon() -> 'QIcon':
     _base = os.path.dirname(os.path.abspath(__file__))
+    _assets = os.path.normpath(os.path.join(_base, '..', 'assets'))
     for name in ('btq_wallet.ico', 'btq_wallet.png', 'btq_wallet.jpg'):
-        path = os.path.join(_base, name)
-        if os.path.isfile(path):
-            icon = QIcon(path)
-            if not icon.isNull():
-                return icon
+        for search_dir in (_base, _assets):
+            path = os.path.join(search_dir, name)
+            if os.path.isfile(path):
+                icon = QIcon(path)
+                if not icon.isNull():
+                    return icon
     # fallback: draw icon programmatically
     sizes = [16, 32, 48, 64, 128, 256]
     icon = QIcon()
@@ -3992,11 +3994,12 @@ class WalletGUI(QMainWindow):
 
     def _create_desktop_shortcut(self):
         _dir = os.path.dirname(os.path.abspath(__file__))
+        _assets = os.path.normpath(os.path.join(_dir, '..', 'assets'))
         # Delegate to platform_utils; settings persistence is handled there
         create_shortcut(
             script_path=os.path.abspath(__file__),
             python_path=sys.executable,
-            icon_path=os.path.join(_dir, 'btq_wallet.png'),
+            icon_path=os.path.join(_assets, 'btq_wallet.png'),
             settings=self._app_settings,
             save_settings_fn=_save_app_settings,
         )
@@ -4539,10 +4542,11 @@ def _create_shortcut_if_needed():
     if settings.get('shortcut_created'):
         return
     _dir = os.path.dirname(os.path.abspath(__file__))
+    _assets = os.path.normpath(os.path.join(_dir, '..', 'assets'))
     create_shortcut(
         script_path=os.path.abspath(__file__),
         python_path=sys.executable,
-        icon_path=os.path.join(_dir, 'btq_wallet.png'),
+        icon_path=os.path.join(_assets, 'btq_wallet.png'),
         settings=settings,
         save_settings_fn=_save_app_settings,
     )

@@ -21,6 +21,13 @@ import shlex
 import subprocess
 
 # ══════════════════════════════════════════════
+#  PATH CONSTANTS
+# ══════════════════════════════════════════════
+
+_HERE   = os.path.dirname(os.path.abspath(__file__))   # src/
+_ASSETS = os.path.join(_HERE, '..', 'assets')          # assets/ (one level up)
+
+# ══════════════════════════════════════════════
 #  PLATFORM DETECTION
 # ══════════════════════════════════════════════
 
@@ -83,9 +90,15 @@ def _create_shortcut_windows(script_path: str, python_path: str,
     # Prefer .ico; fall back to python executable icon
     ico_path = icon_path
     if not ico_path.endswith('.ico'):
-        # look for a .ico next to the supplied icon
+        # look for a .ico next to the supplied icon, then in assets/
         candidate_ico = os.path.splitext(icon_path)[0] + '.ico'
-        ico_path = candidate_ico if os.path.isfile(candidate_ico) else python_path
+        assets_ico = os.path.normpath(os.path.join(_ASSETS, 'btq_wallet.ico'))
+        if os.path.isfile(candidate_ico):
+            ico_path = candidate_ico
+        elif os.path.isfile(assets_ico):
+            ico_path = assets_ico
+        else:
+            ico_path = python_path
 
     if getattr(sys, 'frozen', False):
         target = sys.executable
@@ -157,11 +170,15 @@ def _find_btqd_linux() -> str:
     """Search common Linux locations for the btqd binary."""
     btqd_bin = 'btqd'
 
-    # Same directory as this module (project folder)
+    # Same directory as this module (src/) and project root (one level up)
     try:
-        here = os.path.join(os.path.dirname(os.path.abspath(__file__)), btqd_bin)
+        here = os.path.join(_HERE, btqd_bin)
         if os.path.isfile(here) and os.access(here, os.X_OK):
             return here
+        root = os.path.join(_HERE, '..', btqd_bin)
+        root = os.path.normpath(root)
+        if os.path.isfile(root) and os.access(root, os.X_OK):
+            return root
     except Exception:
         pass
 
@@ -211,11 +228,16 @@ def _create_shortcut_linux(script_path: str, python_path: str,
     # Properly quote paths so spaces don't break the Exec line
     exec_cmd = f'{shlex.quote(python_path)} {shlex.quote(os.path.abspath(script_path))}'
 
-    # Prefer PNG icon; fall back to JPG or whatever was supplied
+    # Prefer PNG icon; fall back to assets/ then JPG or whatever was supplied
     icon = icon_path
     if not icon.endswith('.png'):
         png = os.path.splitext(icon)[0] + '.png'
-        icon = png if os.path.isfile(png) else icon_path
+        assets_png = os.path.normpath(os.path.join(_ASSETS, 'btq_wallet.png'))
+        if os.path.isfile(png):
+            icon = png
+        elif os.path.isfile(assets_png):
+            icon = assets_png
+        # else keep icon_path as-is
 
     desktop_content = (
         '[Desktop Entry]\n'
@@ -280,9 +302,12 @@ def _find_btqd_mac() -> str:
     btqd_bin = 'btqd'
 
     try:
-        here = os.path.join(os.path.dirname(os.path.abspath(__file__)), btqd_bin)
+        here = os.path.join(_HERE, btqd_bin)
         if os.path.isfile(here) and os.access(here, os.X_OK):
             return here
+        root = os.path.normpath(os.path.join(_HERE, '..', btqd_bin))
+        if os.path.isfile(root) and os.access(root, os.X_OK):
+            return root
     except Exception:
         pass
 

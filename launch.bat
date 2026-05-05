@@ -64,7 +64,7 @@ echo.
 REM ---------- Lanzar la wallet ----------
 echo  Abriendo BTQ Wallet...
 echo.
-.venv\Scripts\python.exe simple_wallet_gui.py
+.venv\Scripts\python.exe src\simple_wallet_gui.py
 
 if %errorlevel% neq 0 (
     echo.
