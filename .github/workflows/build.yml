@@ -12,14 +12,14 @@ permissions:
 jobs:
   # ── Windows ────────────────────────────────────────────────────────────
   build-windows:
-    runs-on: windows-latest
+    runs-on: windows-2019        # Windows Server 2019 → binary runs on Win 7 SP1+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.8'  # lowest supported; runs on Win 7 SP1+
 
       - name: Install dependencies
         run: |
@@ -41,20 +41,20 @@ jobs:
 
   # ── Linux ──────────────────────────────────────────────────────────────
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04        # glibc 2.31 → binary runs on Ubuntu 20.04+, Debian 11+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.8'
 
       - name: Install system Qt libs
         run: |
           sudo apt-get update -q
           sudo apt-get install -y libgl1 libglib2.0-0 libdbus-1-3 \
-            libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
             libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxkbcommon-x11-0
 
       - name: Install dependencies
@@ -77,14 +77,16 @@ jobs:
 
   # ── macOS ──────────────────────────────────────────────────────────────
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-13            # macOS 13 Ventura runner
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '10.13'   # binary runs on macOS 10.13 High Sierra+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.8'
 
       - name: Install dependencies
         run: |
@@ -124,11 +126,11 @@ jobs:
 
             ### Download
 
-            | Platform | File |
-            |---|---|
-            | Windows | `BTQWallet-windows.exe` |
-            | Linux | `BTQWallet-linux` |
-            | macOS | `BTQWallet-macos` |
+            | Platform | File | Minimum version |
+            |---|---|---|
+            | Windows | `BTQWallet-windows.exe` | Windows 7 SP1+ |
+            | Linux | `BTQWallet-linux` | Ubuntu 20.04 / Debian 11 / Fedora 34+ |
+            | macOS | `BTQWallet-macos` | macOS 10.13 High Sierra+ |
 
             **No Python or dependencies required** — just download and run.
 

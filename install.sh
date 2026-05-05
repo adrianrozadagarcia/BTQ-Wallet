@@ -13,14 +13,14 @@ echo "   BTQ Wallet — Installation"
 echo " =========================================="
 echo ""
 
-# ── Python 3.9+ ────────────────────────────────────────────────────────────
+# ── Python 3.8+ ────────────────────────────────────────────────────────────
 PYTHON=""
 for cmd in python3 python; do
     if command -v "$cmd" &>/dev/null; then
         ver=$("$cmd" --version 2>&1 | awk '{print $2}')
         maj=$(echo "$ver" | cut -d. -f1)
         min=$(echo "$ver" | cut -d. -f2)
-        if [ "$maj" -ge 3 ] && [ "$min" -ge 9 ]; then
+        if [ "$maj" -ge 3 ] && [ "$min" -ge 8 ]; then
             PYTHON="$cmd"
             echo " [OK] Python $ver ($cmd)"
             break
@@ -29,7 +29,7 @@ for cmd in python3 python; do
 done
 
 if [ -z "$PYTHON" ]; then
-    echo " [ERROR] Python 3.9+ is required but was not found."
+    echo " [ERROR] Python 3.8+ is required but was not found."
     echo ""
     echo "   Debian / Ubuntu:  sudo apt install python3 python3-venv python3-pip"
     echo "   Fedora:           sudo dnf install python3"

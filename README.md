@@ -16,6 +16,20 @@ No accounts. No cloud. No tracking. Your keys, your coins.
 
 ---
 
+## Compatibility
+
+| Platform | Standalone binary | From source |
+|---|---|---|
+| Windows 7 SP1+ | ✅ | ✅ Python 3.8+ |
+| Windows 10 / 11 | ✅ | ✅ Python 3.8+ |
+| Ubuntu 20.04+ / Debian 11+ | ✅ | ✅ Python 3.8+ |
+| Fedora 34+ / Arch / openSUSE | ✅ | ✅ Python 3.8+ |
+| macOS 10.13 High Sierra+ | ✅ | ✅ Python 3.8+ |
+
+> **Older Linux distros** (Ubuntu 18.04, Debian 10): the standalone binary may not work due to glibc version. Use the *from source* method instead.
+
+---
+
 ## Quick Start
 
 ### Option A — Standalone binary *(recommended, no Python required)*
@@ -131,7 +145,7 @@ rpcallowip=127.0.0.1
 
 | Package | Minimum | Notes |
 |---|---|---|
-| Python | 3.9+ | `python3 --version` to check |
+| Python | 3.8+ | `python3 --version` to check |
 | python3-venv | any | Needed to create the virtual environment |
 | python3-pip | any | Usually bundled with Python |
 | PyQt5 | 5.15+ | Can be installed via pip **or** the system package manager |
@@ -151,7 +165,7 @@ chmod +x install.sh
 ```
 
 The installer will:
-- Verify Python 3.9+ is available
+- Verify Python 3.8+ is available
 - Check that `python3-venv` is installed
 - Create a `.venv` virtual environment
 - Install all Python dependencies (`PyQt5`, `qrcode`, `cryptography`, …)
@@ -246,7 +260,7 @@ Both scripts create a `.venv`, install [PyInstaller](https://pyinstaller.org), a
 
 | Dependency | Version |
 |---|---|
-| Python | 3.9+ |
+| Python | 3.8+ |
 | PyQt5 | 5.15+ |
 | qrcode[pil] | 7.0+ |
 | cryptography | 41.0+ |

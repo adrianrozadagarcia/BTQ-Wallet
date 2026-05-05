@@ -3,6 +3,7 @@
 BTQ Wallet — Interfaz gráfica para Bitcoin Quantum
 Requiere nodo BTQ Core en ejecución.
 """
+from __future__ import annotations  # Python 3.8 compatibility for type hints
 import sys
 import os
 import json

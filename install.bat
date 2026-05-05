@@ -12,7 +12,7 @@ REM Find Python
 set PYTHON=
 where python >nul 2>&1 && set PYTHON=python && goto :found
 where py >nul 2>&1 && set PYTHON=py && goto :found
-echo  [ERROR] Python 3.9+ not found. Get it from https://www.python.org
+echo  [ERROR] Python 3.8+ not found. Get it from https://www.python.org
 pause & exit /b 1
 :found
 echo  [OK] Python found (%PYTHON%).

@@ -14,6 +14,7 @@ Public API imported by simple_wallet_gui.py:
     secure_settings_file(path)
     get_subprocess_kwargs()
 """
+from __future__ import annotations  # Python 3.8 compatibility for type hints
 
 import os
 import sys

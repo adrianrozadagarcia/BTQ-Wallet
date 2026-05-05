@@ -11,14 +11,14 @@ echo "   BTQ Wallet — Building standalone binary"
 echo " =========================================="
 echo ""
 
-# ── Find Python 3.9+ ──────────────────────────────────────────────────────
+# ── Find Python 3.8+ ──────────────────────────────────────────────────────
 PYTHON=""
 for cmd in python3 python; do
     if command -v "$cmd" &>/dev/null; then
         ver=$("$cmd" --version 2>&1 | awk '{print $2}')
         major=$(echo "$ver" | cut -d. -f1)
         minor=$(echo "$ver" | cut -d. -f2)
-        if [ "$major" -ge 3 ] && [ "$minor" -ge 9 ]; then
+        if [ "$major" -ge 3 ] && [ "$minor" -ge 8 ]; then
             PYTHON="$cmd"
             echo " [OK] Python $ver ($cmd)"
             break
@@ -26,7 +26,7 @@ for cmd in python3 python; do
     fi
 done
 
-[ -z "$PYTHON" ] && { echo " [ERROR] Python 3.9+ not found."; exit 1; }
+[ -z "$PYTHON" ] && { echo " [ERROR] Python 3.8+ not found."; exit 1; }
 
 # ── Virtual environment ───────────────────────────────────────────────────
 if [ ! -f ".venv/bin/python" ]; then
