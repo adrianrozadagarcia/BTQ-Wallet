@@ -8,6 +8,14 @@ No accounts. No cloud. No tracking. Your keys, your coins.
 
 ---
 
+## Screenshot
+
+<p align="center">
+  <img src="assets/screenshot.png" alt="BTQ Wallet — main screen" width="700"/>
+</p>
+
+---
+
 ## Quick Start
 
 ### Option A — Standalone binary *(recommended, no Python required)*
