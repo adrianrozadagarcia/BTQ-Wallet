@@ -135,7 +135,7 @@ jobs:
             > Linux/macOS: `chmod +x BTQWallet-linux && ./BTQWallet-linux`
 
             ---
-            See [README](https://github.com/your-username/BTQ-Wallet#readme) for node setup instructions.
+            See [README](https://github.com/adrianrozadagarcia/BTQ-Wallet#readme) for node setup instructions.
           files: |
             artifacts/BTQWallet-windows/BTQWallet-windows.exe
             artifacts/BTQWallet-linux/BTQWallet-linux

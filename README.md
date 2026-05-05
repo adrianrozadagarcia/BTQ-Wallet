@@ -20,7 +20,7 @@ No accounts. No cloud. No tracking. Your keys, your coins.
 
 ### Option A — Standalone binary *(recommended, no Python required)*
 
-Download the binary for your platform from the [**Releases page**](https://github.com/your-username/BTQ-Wallet/releases/latest) and run it:
+Download the binary for your platform from the [**Releases page**](https://github.com/adrianrozadagarcia/BTQ-Wallet/releases/latest) and run it:
 
 | Platform | File | How to run |
 |---|---|---|
@@ -30,12 +30,12 @@ Download the binary for your platform from the [**Releases page**](https://githu
 
 **One-liner (PowerShell / Windows):**
 ```powershell
-irm https://github.com/your-username/BTQ-Wallet/releases/latest/download/BTQWallet-windows.exe -OutFile BTQWallet.exe; Start-Process BTQWallet.exe
+irm https://github.com/adrianrozadagarcia/BTQ-Wallet/releases/latest/download/BTQWallet-windows.exe -OutFile BTQWallet.exe; Start-Process BTQWallet.exe
 ```
 
 **One-liner (Linux/macOS):**
 ```bash
-curl -fsSL https://github.com/your-username/BTQ-Wallet/releases/latest/download/BTQWallet-linux -o BTQWallet && chmod +x BTQWallet && ./BTQWallet
+curl -fsSL https://github.com/adrianrozadagarcia/BTQ-Wallet/releases/latest/download/BTQWallet-linux -o BTQWallet && chmod +x BTQWallet && ./BTQWallet
 ```
 
 ### Option B — Run from source
@@ -140,7 +140,7 @@ rpcallowip=127.0.0.1
 
 **1 — Clone the repository**
 ```bash
-git clone https://github.com/your-username/BTQ-Wallet.git
+git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
 cd BTQ-Wallet
 ```
 
