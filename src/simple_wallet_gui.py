@@ -1439,7 +1439,7 @@ class _UpdateWorker(QThread):
                 except ImportError:
                     pass  # PySocks not installed — fall through to direct
 
-            url = 'https://api.github.com/repos/adrianrozadagarcia/BTQ-Wallet/releases/latest'
+            url = 'https://api.github.com/repos/your-username/BTQ-Wallet/releases/latest'
             req = Request(url, headers={'User-Agent': f'BTQWallet/{__version__}'})
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read())
@@ -4054,7 +4054,7 @@ class WalletGUI(QMainWindow):
 
     def _open_releases_page(self):
         import webbrowser
-        webbrowser.open('https://github.com/adrianrozadagarcia/BTQ-Wallet/releases')
+        webbrowser.open('https://github.com/your-username/BTQ-Wallet/releases')
 
     def _on_tray_activated(self, reason):
         if reason == QSystemTrayIcon.DoubleClick:
