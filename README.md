@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="assets/btq_wallet.jpg" alt="BTQ Wallet" width="320"/>
-</p>
-
 # BTQ Wallet
 
 > **by cypherpunks, for cypherpunks**
