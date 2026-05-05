@@ -1,12 +1,26 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# BTQ Wallet — .desktop template
+#
+# This file is a TEMPLATE distributed with the source.
+# The installer (install.sh) generates a personalised copy with absolute paths
+# in ~/.local/share/applications/ and ~/Desktop/.
+#
+# To use manually (replace /path/to/BTQ-Wallet with your actual clone path):
+#   1. Edit the Exec and Path lines below.
+#   2. Copy to ~/.local/share/applications/btq-wallet.desktop
+#   3. chmod +x ~/.local/share/applications/btq-wallet.desktop
+#   4. update-desktop-database ~/.local/share/applications
+# ─────────────────────────────────────────────────────────────────────────────
 [Desktop Entry]
 Version=1.1
 Type=Application
 Name=BTQ Wallet
 GenericName=Bitcoin Quantum Wallet
-Comment=Post-quantum desktop wallet for the BTQ testnet
-Exec=bash -c 'cd "$(dirname "$(readlink -f "%k")")" && bash launch.sh'
-Icon=btq-wallet
+Comment=Post-quantum desktop wallet for the BTQ network
+Exec=bash -c 'cd "$(dirname "$(readlink -f "%k")")" && ./launch.sh'
+Path=/path/to/BTQ-Wallet
+Icon=/path/to/BTQ-Wallet/btq_wallet.png
 Terminal=false
 Categories=Finance;Network;
 Keywords=bitcoin;quantum;wallet;btq;crypto;dilithium;
-StartupNotify=true
+StartupNotify=false

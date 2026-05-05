@@ -18,7 +18,7 @@ hidden = (
     ]
 )
 
-datas = collect_data_files('qrcode') + collect_data_files('cryptography')
+datas = collect_data_files('qrcode') + collect_data_files('cryptography') + [('platform_utils.py', '.')]
 
 a = Analysis(
     ['simple_wallet_gui.py'],

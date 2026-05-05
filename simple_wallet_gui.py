@@ -33,7 +33,8 @@ try:
         QTabWidget, QMessageBox, QFileDialog, QGroupBox, QGridLayout,
         QHeaderView, QStatusBar, QComboBox, QInputDialog, QFrame,
         QSizePolicy, QAbstractItemView, QCheckBox, QSpinBox, QDoubleSpinBox,
-        QDialog, QSystemTrayIcon, QMenu, QAction, QCompleter, QTextEdit
+        QDialog, QSystemTrayIcon, QMenu, QAction, QCompleter, QTextEdit,
+        QScrollArea
     )
     from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QSize, QEvent, QStringListModel
     from PyQt5.QtWidgets import QShortcut
@@ -61,12 +62,17 @@ except ImportError:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Platform detection
+# Platform detection  (logic lives in platform_utils.py)
 # ─────────────────────────────────────────────────────────────────────────────
 
-_SYS     = platform.system()          # 'Windows' | 'Linux' | 'Darwin'
-_IS_WIN  = _SYS == 'Windows'
-_BTQD_BIN = 'btqd.exe' if _IS_WIN else 'btqd'
+from platform_utils import IS_WIN as _IS_WIN, IS_LINUX as _IS_LINUX, IS_MAC as _IS_MAC
+from platform_utils import (get_settings_path, get_btqd_exe_name, find_btqd,
+                             find_btq_configs, get_btqconf_default_path,
+                             create_shortcut, secure_settings_file,
+                             get_subprocess_kwargs)
+
+_SYS      = platform.system()          # 'Windows' | 'Linux' | 'Darwin'
+_BTQD_BIN = get_btqd_exe_name()
 
 
 def _default_datadir() -> str:
@@ -374,8 +380,8 @@ __version__ = '1.4.0'
 
 _LANG = 'en'
 _LANGS = [('en', 'English'), ('es', 'Español'), ('ru', 'Русский'), ('zh', '中文')]
-_SETTINGS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                               'btq_wallet_settings.json')
+
+_SETTINGS_PATH = get_settings_path()
 
 TRANSLATIONS: dict = {
     'en': {
@@ -563,6 +569,7 @@ TRANSLATIONS: dict = {
         'fee_custom': 'Custom',
         'lbl_fee_estimate': 'Estimated fee: {fee:.8f} BTQ',
         'lbl_fee_rate': 'Fee rate (BTQ/kB):',
+        'lbl_fee_speed': 'Speed',
         # System tray
         'tray_tooltip': 'BTQ Wallet',
         'tray_open': 'Open Wallet',
@@ -575,6 +582,20 @@ TRANSLATIONS: dict = {
         'update_available': 'New version available: {version}  —  ',
         'update_download': 'Download',
         'update_checking': 'Checking for updates…',
+        # Feature additions
+        'tx_detail_title': 'Transaction Details',
+        'tx_detail_copy_txid': 'Copy TXID',
+        'tx_detail_confirmations': 'Confirmations',
+        'tx_detail_fee': 'Fee',
+        'btn_export_csv': 'Export CSV',
+        'csv_saved': 'Transactions saved to:\n{path}',
+        'csv_no_data': 'No transactions to export.',
+        'group_multi_send': 'ADDITIONAL RECIPIENTS',
+        'btn_add_recipient': '+ Add Recipient',
+        'btn_remove_recipient': 'Remove',
+        'backup_reminder_msg': 'No recent backup found. Back up your wallet now to avoid losing funds.',
+        'backup_reminder_dismiss': 'Dismiss',
+        'lbl_balance_history': 'Balance History',
     },
     'es': {
         'tab_balance': 'BALANCE', 'tab_addresses': 'DIRECCIONES',
@@ -741,6 +762,7 @@ TRANSLATIONS: dict = {
         'fee_custom': 'Personalizado',
         'lbl_fee_estimate': 'Comisión estimada: {fee:.8f} BTQ',
         'lbl_fee_rate': 'Tasa de comisión (BTQ/kB):',
+        'lbl_fee_speed': 'Velocidad',
         'tray_tooltip': 'BTQ Wallet',
         'tray_open': 'Abrir Wallet',
         'tray_lock': 'Bloquear Wallet',
@@ -751,6 +773,19 @@ TRANSLATIONS: dict = {
         'update_available': 'Nueva versión disponible: {version}  —  ',
         'update_download': 'Descargar',
         'update_checking': 'Buscando actualizaciones…',
+        'tx_detail_title': 'Detalles de la transacción',
+        'tx_detail_copy_txid': 'Copiar TXID',
+        'tx_detail_confirmations': 'Confirmaciones',
+        'tx_detail_fee': 'Comisión',
+        'btn_export_csv': 'Exportar CSV',
+        'csv_saved': 'Transacciones guardadas en:\n{path}',
+        'csv_no_data': 'No hay transacciones para exportar.',
+        'group_multi_send': 'DESTINATARIOS ADICIONALES',
+        'btn_add_recipient': '+ Añadir destinatario',
+        'btn_remove_recipient': 'Eliminar',
+        'backup_reminder_msg': 'No se encontró una copia de seguridad reciente. Haz una copia ahora para evitar perder fondos.',
+        'backup_reminder_dismiss': 'Descartar',
+        'lbl_balance_history': 'Historial de balance',
     },
     'ru': {
         'tab_balance': 'БАЛАНС', 'tab_addresses': 'АДРЕСА',
@@ -917,6 +952,7 @@ TRANSLATIONS: dict = {
         'fee_custom': 'Вручную',
         'lbl_fee_estimate': 'Примерная комиссия: {fee:.8f} BTQ',
         'lbl_fee_rate': 'Ставка комиссии (BTQ/кБ):',
+        'lbl_fee_speed': 'Скорость',
         'tray_tooltip': 'BTQ Wallet',
         'tray_open': 'Открыть',
         'tray_lock': 'Заблокировать',
@@ -927,6 +963,19 @@ TRANSLATIONS: dict = {
         'update_available': 'Доступна новая версия: {version}  —  ',
         'update_download': 'Скачать',
         'update_checking': 'Проверка обновлений…',
+        'tx_detail_title': 'Детали транзакции',
+        'tx_detail_copy_txid': 'Копировать TXID',
+        'tx_detail_confirmations': 'Подтверждения',
+        'tx_detail_fee': 'Комиссия',
+        'btn_export_csv': 'Экспорт CSV',
+        'csv_saved': 'Транзакции сохранены в:\n{path}',
+        'csv_no_data': 'Нет транзакций для экспорта.',
+        'group_multi_send': 'ДОПОЛНИТЕЛЬНЫЕ ПОЛУЧАТЕЛИ',
+        'btn_add_recipient': '+ Добавить получателя',
+        'btn_remove_recipient': 'Удалить',
+        'backup_reminder_msg': 'Резервная копия не найдена. Создайте её сейчас, чтобы не потерять средства.',
+        'backup_reminder_dismiss': 'Закрыть',
+        'lbl_balance_history': 'История баланса',
     },
     'zh': {
         'tab_balance': '余额', 'tab_addresses': '地址',
@@ -1093,6 +1142,7 @@ TRANSLATIONS: dict = {
         'fee_custom': '自定义',
         'lbl_fee_estimate': '预估手续费: {fee:.8f} BTQ',
         'lbl_fee_rate': '手续费率 (BTQ/kB):',
+        'lbl_fee_speed': '速度',
         'tray_tooltip': 'BTQ Wallet',
         'tray_open': '打开钱包',
         'tray_lock': '锁定钱包',
@@ -1103,6 +1153,19 @@ TRANSLATIONS: dict = {
         'update_available': '有新版本: {version}  —  ',
         'update_download': '下载',
         'update_checking': '检查更新中…',
+        'tx_detail_title': '交易详情',
+        'tx_detail_copy_txid': '复制交易ID',
+        'tx_detail_confirmations': '确认数',
+        'tx_detail_fee': '手续费',
+        'btn_export_csv': '导出CSV',
+        'csv_saved': '交易已保存至:\n{path}',
+        'csv_no_data': '没有可导出的交易。',
+        'group_multi_send': '附加收款方',
+        'btn_add_recipient': '+ 添加收款方',
+        'btn_remove_recipient': '删除',
+        'backup_reminder_msg': '未找到最近的备份。请立即备份钱包以避免资金损失。',
+        'backup_reminder_dismiss': '忽略',
+        'lbl_balance_history': '余额历史',
     },
 }
 
@@ -1139,18 +1202,7 @@ def _save_app_settings(settings: dict):
         with open(_SETTINGS_PATH, 'w', encoding='utf-8') as f:
             json.dump(settings, f, indent=2)
         # Restrict file to current user only
-        try:
-            if _IS_WIN:
-                import getpass
-                user = getpass.getuser()
-                subprocess.run(
-                    ['icacls', _SETTINGS_PATH, '/inheritance:r', '/grant:r', f'{user}:RW'],
-                    capture_output=True, creationflags=0x08000000, timeout=5
-                )
-            else:
-                os.chmod(_SETTINGS_PATH, 0o600)
-        except Exception:
-            pass
+        secure_settings_file(_SETTINGS_PATH)
     except OSError:
         pass
 
@@ -1159,18 +1211,7 @@ def _save_app_settings(settings: dict):
 # Detección de configuración BTQ
 # ─────────────────────────────────────────────────────────────────────────────
 
-def find_btq_configs() -> list:
-    appdata = os.environ.get('APPDATA', '')
-    home = os.path.expanduser('~')
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    candidates = [
-        os.path.join(appdata, 'BTQ', 'btq.conf'),
-        os.path.join(appdata, 'BTQ', 'test', 'btq.conf'),
-        os.path.join(home, '.btq', 'btq.conf'),
-        os.path.join(home, 'btq-data', 'btq.conf'),
-        os.path.join(script_dir, 'btq.conf'),
-    ]
-    return [p for p in candidates if os.path.exists(p)]
+# find_btq_configs is imported from platform_utils (see top of file)
 
 
 def parse_btq_config(path: str) -> dict:
@@ -1580,6 +1621,8 @@ class WalletGUI(QMainWindow):
         # Lock on startup if a PIN is configured
         if self._app_settings.get('pin_hash'):
             QTimer.singleShot(500, self._lock)
+        # Check backup reminder after UI is built
+        QTimer.singleShot(3000, self._check_backup_reminder)
 
     # ──────────────────────────── Construcción UI ─────────────────────────
 
@@ -1816,6 +1859,27 @@ class WalletGUI(QMainWindow):
         hv.addWidget(self._bal_pending)
         v.addWidget(hero)
 
+        # Backup reminder banner — hidden until check triggers it
+        self._backup_reminder = QWidget()
+        self._backup_reminder.setStyleSheet(
+            'background: #3a2000; border: 1px solid #a05000; border-radius: 3px; padding: 0px;')
+        br_h = QHBoxLayout(self._backup_reminder)
+        br_h.setContentsMargins(12, 6, 12, 6)
+        br_msg = QLabel(t('backup_reminder_msg'))
+        br_msg.setStyleSheet('color: #ffab40; font-size: 11px; background: transparent; border: none;')
+        br_msg.setWordWrap(True)
+        br_msg.mousePressEvent = lambda e: self.tabs.setCurrentIndex(0)
+        br_h.addWidget(br_msg, 1)
+        br_dismiss = QPushButton(t('backup_reminder_dismiss'))
+        br_dismiss.setStyleSheet(
+            'color: #ffab40; background: transparent; border: 1px solid #a05000; '
+            'border-radius: 3px; padding: 2px 10px; font-size: 11px;')
+        br_dismiss.setCursor(Qt.PointingHandCursor)
+        br_dismiss.clicked.connect(lambda: self._backup_reminder.hide())
+        br_h.addWidget(br_dismiss)
+        self._backup_reminder.hide()
+        v.addWidget(self._backup_reminder)
+
         # Stats grid
         stats = QGroupBox(t('group_wallet_status'))
         sg = QGridLayout(stats)
@@ -1837,6 +1901,17 @@ class WalletGUI(QMainWindow):
         sg.addWidget(self._s_txcount,   1, 1)
         sg.addWidget(self._s_block,     1, 3)
         v.addWidget(stats)
+
+        # Balance history chart
+        chart_lbl_hdr = _lbl(t('lbl_balance_history'), color=G['text_muted'], size=10)
+        v.addWidget(chart_lbl_hdr)
+        self._balance_chart_lbl = QLabel()
+        self._balance_chart_lbl.setAlignment(Qt.AlignLeft)
+        self._balance_chart_lbl.setStyleSheet(
+            f'background: {G["surface2"]}; border: 1px solid {G["border2"]}; border-radius: 3px;')
+        self._balance_chart_lbl.setFixedHeight(82)
+        self._balance_chart_lbl.setMinimumWidth(400)
+        v.addWidget(self._balance_chart_lbl)
 
         # Backup
         backup = QGroupBox(t('group_backup'))
@@ -1946,15 +2021,37 @@ class WalletGUI(QMainWindow):
         v.setContentsMargins(20, 14, 20, 14)
 
         form = QGroupBox(t('group_send'))
+        form.setStyleSheet(f"""
+            QGroupBox {{ border: 1px solid {G['border']}; border-radius: 4px;
+                         margin-top: 14px; padding-top: 10px; background: {G['surface']}; }}
+            QGroupBox::title {{ subcontrol-origin: margin; left: 10px; padding: 0 6px;
+                                color: {G['green_lo']}; font-size: 10px; letter-spacing: 2px; }}
+            QLineEdit {{ padding: 8px 12px; min-height: 32px; }}
+        """)
         fg = QGridLayout(form)
-        fg.setSpacing(10)
+        fg.setSpacing(12)
         fg.setColumnStretch(1, 1)
 
         fg.addWidget(_lbl(t('lbl_recipient'), color=G['text_muted'], size=11), 0, 0)
+        addr_row_w = QWidget()
+        addr_row_h = QHBoxLayout(addr_row_w)
+        addr_row_h.setContentsMargins(0, 0, 0, 0)
+        addr_row_h.setSpacing(6)
         self._to_addr = QLineEdit()
         self._to_addr.setPlaceholderText(t('ph_recipient'))
         self._to_addr.textChanged.connect(self._check_address_reuse)
-        fg.addWidget(self._to_addr, 0, 1)
+        self._to_addr.textChanged.connect(self._on_addr_text_changed)
+        addr_row_h.addWidget(self._to_addr)
+        self._addr_valid_lbl = QLabel('')
+        self._addr_valid_lbl.setFixedWidth(22)
+        self._addr_valid_lbl.setAlignment(Qt.AlignCenter)
+        self._addr_valid_lbl.setFont(QFont('Consolas', 14))
+        self._addr_valid_lbl.hide()
+        addr_row_h.addWidget(self._addr_valid_lbl)
+        fg.addWidget(addr_row_w, 0, 1)
+        self._addr_validate_timer = QTimer(self)
+        self._addr_validate_timer.setSingleShot(True)
+        self._addr_validate_timer.timeout.connect(self._validate_address_ui)
 
         self._addr_reuse_lbl = QLabel('')
         self._addr_reuse_lbl.setWordWrap(True)
@@ -2000,7 +2097,7 @@ class WalletGUI(QMainWindow):
             self._fee_combo.addItem(t(key), key)
         self._fee_combo.setCurrentIndex(1)  # Normal by default
         self._fee_combo.currentIndexChanged.connect(self._on_fee_speed_changed)
-        fee_grid.addWidget(_lbl(t('lbl_fee_rate') if False else '', color=G['text_muted'], size=11), 0, 0)
+        fee_grid.addWidget(_lbl(t('lbl_fee_speed'), color=G['text_muted'], size=11), 0, 0)
         fee_grid.addWidget(self._fee_combo, 0, 1, Qt.AlignLeft)
 
         self._fee_custom_spin = QDoubleSpinBox()
@@ -2011,7 +2108,9 @@ class WalletGUI(QMainWindow):
         self._fee_custom_spin.setFixedWidth(160)
         self._fee_custom_spin.hide()
         self._fee_custom_spin.valueChanged.connect(self._update_fee_estimate)
-        fee_grid.addWidget(_lbl(t('lbl_fee_rate'), color=G['text_muted'], size=11), 1, 0)
+        self._fee_rate_lbl = _lbl(t('lbl_fee_rate'), color=G['text_muted'], size=11)
+        self._fee_rate_lbl.hide()
+        fee_grid.addWidget(self._fee_rate_lbl, 1, 0)
         fee_grid.addWidget(self._fee_custom_spin, 1, 1, Qt.AlignLeft)
 
         self._fee_estimate_lbl = _lbl(t('lbl_fee_estimate', fee=0.0), color=G['green_lo'], size=11, mono=True)
@@ -2098,6 +2197,25 @@ class WalletGUI(QMainWindow):
         self._ab_refresh_table()
         self._ab_setup_completer()
 
+        # ── Multi-output send ─────────────────────────────────────────────
+        self._extra_recipients = []
+        multi_box = QGroupBox(t('group_multi_send'))
+        multi_box.setCheckable(True)
+        multi_box.setChecked(False)
+        multi_v = QVBoxLayout(multi_box)
+        multi_v.setSpacing(6)
+
+        self._multi_recipients_layout = QVBoxLayout()
+        self._multi_recipients_layout.setSpacing(4)
+        multi_v.addLayout(self._multi_recipients_layout)
+
+        btn_add_recip = _btn(t('btn_add_recipient'))
+        btn_add_recip.clicked.connect(self._add_extra_recipient)
+        multi_v.addWidget(btn_add_recip)
+
+        v.addWidget(multi_box)
+        v.addSpacing(8)
+
         btn_send = _btn(t('btn_send_tx'), obj_name='primary')
         btn_send.setMinimumHeight(42)
         btn_send.clicked.connect(self._send_tx)
@@ -2114,6 +2232,10 @@ class WalletGUI(QMainWindow):
 
         toolbar = QHBoxLayout()
         toolbar.addStretch()
+        btn_csv = _btn(t('btn_export_csv'))
+        btn_csv.setFixedWidth(120)
+        btn_csv.clicked.connect(self._export_tx_csv)
+        toolbar.addWidget(btn_csv)
         btn_refresh = _btn(t('btn_refresh'))
         btn_refresh.setFixedWidth(110)
         btn_refresh.clicked.connect(lambda: self._start_worker(['transactions']))
@@ -2137,6 +2259,7 @@ class WalletGUI(QMainWindow):
         self._tx_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._tx_table.setAlternatingRowColors(True)
         self._tx_table.verticalHeader().setVisible(False)
+        self._tx_table.doubleClicked.connect(self._show_tx_detail)
         v.addWidget(self._tx_table)
         self.tabs.addTab(w, t('tab_transactions'))
 
@@ -2286,15 +2409,27 @@ class WalletGUI(QMainWindow):
     # ──────────────────────────── Tab: Configuración ──────────────────────
 
     def _tab_settings(self):
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
         w = QWidget()
+        w.setStyleSheet(
+            "QLineEdit, QComboBox { padding: 8px 12px; min-height: 32px; }"
+            "QPushButton { padding: 8px 18px; min-height: 32px; font-size: 12px; }"
+            "QSpinBox, QDoubleSpinBox { padding: 6px 8px; min-height: 32px; }"
+            "QCheckBox { font-size: 13px; spacing: 8px; }"
+        )
         v = QVBoxLayout(w)
         v.setContentsMargins(20, 14, 20, 14)
+        v.setSpacing(14)
 
         # ── RPC connection ────────────────────────────────────────────────
         rpc_box = QGroupBox(t('group_rpc'))
         rg = QGridLayout(rpc_box)
         rg.setColumnStretch(1, 1)
-        rg.setSpacing(10)
+        rg.setSpacing(12)
 
         for i, (lkey, attr, default, echo) in enumerate([
             ('lbl_host',     'rpc_host', '127.0.0.1', False),
@@ -2334,7 +2469,7 @@ class WalletGUI(QMainWindow):
         node_box = QGroupBox(t('group_node'))
         ndg = QGridLayout(node_box)
         ndg.setColumnStretch(1, 1)
-        ndg.setSpacing(10)
+        ndg.setSpacing(12)
 
         ndg.addWidget(_lbl('btqd.exe', color=G['text_muted'], size=11), 0, 0)
         self._btqd_path = QLineEdit()
@@ -2562,7 +2697,7 @@ class WalletGUI(QMainWindow):
         # ── btq.conf help ─────────────────────────────────────────────────
         help_box = QGroupBox(t('group_btqconf'))
         hv = QVBoxLayout(help_box)
-        cfg_path = os.path.join(os.environ.get('APPDATA', '~'), 'BTQ', 'btq.conf')
+        cfg_path = get_btqconf_default_path()
         help_txt = QLabel(
             f'server=1\nrpcuser=youruser\nrpcpassword=yourpassword\nrpcallowip=127.0.0.1\n\n'
             f'{t("btqconf_location", path=cfg_path)}')
@@ -2574,7 +2709,8 @@ class WalletGUI(QMainWindow):
         hv.addWidget(help_txt)
         v.addWidget(help_box)
         v.addStretch()
-        self.tabs.addTab(w, t('tab_settings'))
+        scroll.setWidget(w)
+        self.tabs.addTab(scroll, t('tab_settings'))
 
     # ──────────────────────────── Timer ───────────────────────────────────
 
@@ -2676,23 +2812,7 @@ class WalletGUI(QMainWindow):
 
     @staticmethod
     def _find_btqd() -> str:
-        desktop = os.path.join(os.path.expanduser('~'), 'Desktop')
-        try:
-            for entry in os.listdir(desktop):
-                full = os.path.join(desktop, entry)
-                if os.path.isdir(full):
-                    candidate = os.path.join(full, _BTQD_BIN)
-                    if os.path.exists(candidate):
-                        return candidate
-        except OSError:
-            pass
-        if not _IS_WIN:
-            for path in ['/usr/local/bin/btqd', '/usr/bin/btqd',
-                         os.path.expanduser('~/btqd'),
-                         os.path.expanduser('~/.local/bin/btqd')]:
-                if os.path.exists(path):
-                    return path
-        return ''
+        return find_btqd()
 
     def _browse_btqd(self):
         path, _ = QFileDialog.getOpenFileName(self, 'Seleccionar btqd.exe', '', 'Ejecutables (*.exe)')
@@ -2784,11 +2904,7 @@ class WalletGUI(QMainWindow):
             args.append('-i2pacceptincoming')
             if not tor_proxy:
                 args.append('-onlynet=i2p')
-        popen_kwargs = {}
-        if _IS_WIN:
-            popen_kwargs['creationflags'] = 0x08000008
-        else:
-            popen_kwargs['start_new_session'] = True
+        popen_kwargs = get_subprocess_kwargs()
         try:
             subprocess.Popen(args, **popen_kwargs)
             self._node_status.setText(t('node_starting'))
@@ -2958,6 +3074,7 @@ class WalletGUI(QMainWindow):
                 self._used_addresses.add(addr)
         txs = sorted(txs, key=lambda t: t.get('time', 0), reverse=True)
         self._tx_table.setRowCount(len(txs))
+        self._cached_txs = txs  # cache for CSV export
         for row, tx in enumerate(txs):
             txid     = tx.get('txid', '—')
             cat      = tx.get('category', '—')
@@ -2967,7 +3084,9 @@ class WalletGUI(QMainWindow):
             ts       = tx.get('time', 0)
             date_str = datetime.fromtimestamp(ts).strftime('%Y-%m-%d  %H:%M') if ts else '—'
 
-            self._tx_table.setItem(row, 0, QTableWidgetItem(txid[:20] + '…'))
+            txid_item = QTableWidgetItem(txid[:20] + '…')
+            txid_item.setData(Qt.UserRole, txid)
+            self._tx_table.setItem(row, 0, txid_item)
 
             cat_label = t(f'tx_{cat}', **{}) if f'tx_{cat}' in TRANSLATIONS['en'] else cat
             cat_item = QTableWidgetItem(cat_label.upper())
@@ -2986,6 +3105,16 @@ class WalletGUI(QMainWindow):
                 QColor(G['green']) if confs >= 6 else QColor(G['orange']))
             self._tx_table.setItem(row, 4, conf_item)
             self._tx_table.setItem(row, 5, QTableWidgetItem(date_str))
+
+        # Compute running balance history for chart (oldest-first)
+        sorted_asc = sorted(txs, key=lambda tx: tx.get('time', 0))
+        running = 0.0
+        history = []
+        for tx in sorted_asc:
+            running += float(tx.get('amount', 0))
+            history.append(running)
+        if hasattr(self, '_balance_chart_lbl') and history:
+            self._draw_balance_chart(history)
 
     def _update_network(self, data: dict):
         ci = data.get('chaininfo', {})
@@ -3153,6 +3282,41 @@ class WalletGUI(QMainWindow):
             self._send_with_coin_control(to, amount, note, selected)
             return
 
+        # Check for extra recipients (multi-output send)
+        extra = getattr(self, '_extra_recipients', [])
+        if extra:
+            outputs = {to: round(amount, 8)}
+            for addr_edit, amt_edit in extra:
+                extra_addr = addr_edit.text().strip()
+                extra_amt_str = amt_edit.text().strip()
+                if not extra_addr or not extra_amt_str:
+                    continue
+                try:
+                    extra_amt = float(extra_amt_str)
+                    if extra_amt <= 0:
+                        continue
+                except ValueError:
+                    continue
+                if extra_addr in outputs:
+                    outputs[extra_addr] = round(outputs[extra_addr] + extra_amt, 8)
+                else:
+                    outputs[extra_addr] = round(extra_amt, 8)
+            try:
+                conf_target = self._get_fee_conf_target()
+                txid = self.rpc.call('sendmany', '', outputs, conf_target, note)
+                QMessageBox.information(self, t('tab_send'), t('dlg_tx_sent', txid=txid))
+                self._to_addr.clear()
+                self._amount.clear()
+                self._send_note.clear()
+                for addr_edit, amt_edit in extra:
+                    addr_edit.clear()
+                    amt_edit.clear()
+                self._start_worker(['balance', 'transactions'])
+                self._set_status(f'TX: {txid[:20]}…')
+            except (BTQRPCError, ConnectionError) as e:
+                QMessageBox.critical(self, 'BTQ', str(e))
+            return
+
         try:
             conf_target = self._get_fee_conf_target()
             txid = self.rpc.send_to_address(to, amount, note, conf_target)
@@ -3192,6 +3356,10 @@ class WalletGUI(QMainWindow):
         abs_path = os.path.abspath(path).replace('\\', '/')
         try:
             self.rpc.backup_wallet(abs_path)
+            self._app_settings['last_backup_ts'] = int(time.time())
+            _save_app_settings(self._app_settings)
+            if hasattr(self, '_backup_reminder'):
+                self._backup_reminder.hide()
             QMessageBox.information(self, t('btn_backup_wallet'), t('dlg_backup_done', path=abs_path))
             self._set_status(t('status_backup_done'))
         except (BTQRPCError, ConnectionError) as e:
@@ -3334,6 +3502,251 @@ class WalletGUI(QMainWindow):
             self._set_status(f'TX: {txid[:20]}…')
         except (BTQRPCError, ConnectionError) as e:
             QMessageBox.critical(self, 'BTQ', str(e))
+
+    # ──────────────────────────── Feature: TX detail dialog ──────────────
+
+    def _show_tx_detail(self, index):
+        row = index.row()
+        txid_item = self._tx_table.item(row, 0)
+        if not txid_item:
+            return
+        txid = txid_item.data(Qt.UserRole) or txid_item.text().rstrip('…')
+        if not txid or txid == '—':
+            return
+        if not self._require_conn():
+            return
+        try:
+            result = self.rpc.call('gettransaction', txid)
+        except BTQRPCError as e:
+            QMessageBox.warning(self, t('tx_detail_title'), str(e))
+            return
+
+        dlg = QDialog(self)
+        dlg.setWindowTitle(t('tx_detail_title'))
+        dlg.setMinimumSize(620, 460)
+        dlg.setStyleSheet(f'background: {G["surface"]}; border: 1px solid {G["border"]};')
+        lay = QVBoxLayout(dlg)
+        lay.setSpacing(8)
+        lay.setContentsMargins(16, 14, 16, 14)
+
+        # TXID row
+        txid_h = QHBoxLayout()
+        txid_lbl = QLabel(t('col_txid') + ':')
+        txid_lbl.setStyleSheet(f'color: {G["text_muted"]}; font-size: 11px;')
+        txid_h.addWidget(txid_lbl)
+        txid_val = QLineEdit(txid)
+        txid_val.setReadOnly(True)
+        txid_val.setFont(QFont('Consolas', 9))
+        txid_val.setStyleSheet(
+            f'color: {G["green"]}; background: {G["surface2"]}; '
+            f'border: 1px solid {G["border"]}; border-radius: 3px; padding: 4px 8px;')
+        txid_h.addWidget(txid_val)
+        lay.addLayout(txid_h)
+
+        # Summary fields
+        grid_w = QWidget()
+        grid = QGridLayout(grid_w)
+        grid.setSpacing(6)
+        grid.setColumnStretch(1, 1)
+        grid.setColumnStretch(3, 1)
+
+        amount = result.get('amount', 0.0)
+        confs = result.get('confirmations', 0)
+        ts = result.get('time', 0)
+        fee = result.get('fee', None)
+        date_str = datetime.fromtimestamp(ts).strftime('%Y-%m-%d  %H:%M:%S') if ts else '—'
+
+        def _add_field(row, col_lbl, col_val, label, value, vcolor=None):
+            lbl = QLabel(label + ':')
+            lbl.setStyleSheet(f'color: {G["text_muted"]}; font-size: 11px;')
+            val = QLabel(value)
+            val.setFont(QFont('Consolas', 10))
+            val.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            if vcolor:
+                val.setStyleSheet(f'color: {vcolor};')
+            grid.addWidget(lbl, row, col_lbl)
+            grid.addWidget(val, row, col_val)
+
+        _add_field(0, 0, 1, t('col_amount'),
+                   f'{amount:+.8f} BTQ',
+                   G['green'] if amount >= 0 else G['red'])
+        _add_field(0, 2, 3, t('tx_detail_confirmations'), str(confs),
+                   G['green'] if confs >= 6 else G['orange'])
+        _add_field(1, 0, 1, t('col_date'), date_str)
+        if fee is not None:
+            _add_field(1, 2, 3, t('tx_detail_fee'), f'{fee:.8f} BTQ', G['orange'])
+
+        lay.addWidget(grid_w)
+
+        # Full JSON in scrollable text edit
+        detail_edit = QTextEdit()
+        detail_edit.setReadOnly(True)
+        detail_edit.setFont(QFont('Consolas', 9))
+        detail_edit.setPlainText(json.dumps(result, indent=2))
+        detail_edit.setStyleSheet(
+            f'background: {G["surface2"]}; color: {G["text_muted"]}; '
+            f'border: 1px solid {G["border2"]}; border-radius: 3px; padding: 6px;')
+        lay.addWidget(detail_edit)
+
+        # Buttons
+        btn_row = QHBoxLayout()
+        btn_copy = _btn(t('tx_detail_copy_txid'), obj_name='primary')
+        btn_copy.clicked.connect(lambda: self._copy(txid))
+        btn_close = QPushButton('Close')
+        btn_close.clicked.connect(dlg.accept)
+        btn_row.addWidget(btn_copy)
+        btn_row.addStretch()
+        btn_row.addWidget(btn_close)
+        lay.addLayout(btn_row)
+
+        dlg.exec_()
+
+    # ──────────────────────────── Feature: Export CSV ─────────────────────
+
+    def _export_tx_csv(self):
+        txs = getattr(self, '_cached_txs', None)
+        if not txs:
+            QMessageBox.information(self, t('btn_export_csv'), t('csv_no_data'))
+            return
+        path, _ = QFileDialog.getSaveFileName(
+            self, t('btn_export_csv'),
+            f'btq_transactions_{datetime.now().strftime("%Y%m%d_%H%M")}.csv',
+            'CSV (*.csv)')
+        if not path:
+            return
+        import csv as _csv
+        try:
+            with open(path, 'w', newline='', encoding='utf-8') as f:
+                writer = _csv.writer(f)
+                writer.writerow(['txid', 'type', 'address', 'amount', 'confirmations', 'date'])
+                for tx in txs:
+                    ts = tx.get('time', 0)
+                    date_str = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') if ts else ''
+                    writer.writerow([
+                        tx.get('txid', ''),
+                        tx.get('category', ''),
+                        tx.get('address', ''),
+                        tx.get('amount', ''),
+                        tx.get('confirmations', ''),
+                        date_str,
+                    ])
+            QMessageBox.information(self, t('btn_export_csv'), t('csv_saved', path=path))
+            self._set_status(t('btn_export_csv'))
+        except OSError as e:
+            QMessageBox.critical(self, t('btn_export_csv'), str(e))
+
+    # ──────────────────────────── Feature: Multi-output send ─────────────
+
+    def _add_extra_recipient(self):
+        row_w = QWidget()
+        row_h = QHBoxLayout(row_w)
+        row_h.setContentsMargins(0, 0, 0, 0)
+        row_h.setSpacing(6)
+        addr_edit = QLineEdit()
+        addr_edit.setPlaceholderText(t('ph_recipient'))
+        amt_edit = QLineEdit()
+        amt_edit.setPlaceholderText('0.00000000')
+        amt_edit.setFixedWidth(120)
+        btn_rm = QPushButton(t('btn_remove_recipient'))
+        btn_rm.setObjectName('danger')
+        btn_rm.setFixedWidth(80)
+        row_h.addWidget(addr_edit)
+        row_h.addWidget(amt_edit)
+        row_h.addWidget(btn_rm)
+        entry = (addr_edit, amt_edit)
+        self._extra_recipients.append(entry)
+
+        def _remove():
+            self._extra_recipients.remove(entry)
+            row_w.deleteLater()
+        btn_rm.clicked.connect(_remove)
+
+        self._multi_recipients_layout.addWidget(row_w)
+
+    # ──────────────────────────── Feature: Backup reminder ───────────────
+
+    def _check_backup_reminder(self):
+        last_ts = self._app_settings.get('last_backup_ts', 0)
+        seven_days = 7 * 24 * 3600
+        if not last_ts or (int(time.time()) - last_ts) > seven_days:
+            if hasattr(self, '_backup_reminder'):
+                self._backup_reminder.show()
+
+    # ──────────────────────────── Feature: Address validation ────────────
+
+    def _on_addr_text_changed(self, text: str):
+        if not hasattr(self, '_addr_validate_timer'):
+            return
+        self._addr_validate_timer.stop()
+        if not text.strip():
+            if hasattr(self, '_addr_valid_lbl'):
+                self._addr_valid_lbl.hide()
+            return
+        self._addr_validate_timer.start(400)
+
+    def _validate_address_ui(self):
+        if not hasattr(self, '_addr_valid_lbl') or not hasattr(self, '_to_addr'):
+            return
+        text = self._to_addr.text().strip()
+        if not text:
+            self._addr_valid_lbl.hide()
+            return
+        if not self._connected or not self.rpc:
+            self._addr_valid_lbl.hide()
+            return
+        try:
+            result = self.rpc.call('validateaddress', text)
+            is_valid = result.get('isvalid', False)
+            if is_valid:
+                self._addr_valid_lbl.setText('✓')
+                self._addr_valid_lbl.setStyleSheet(f'color: {G["green"]}; font-size: 14px;')
+            else:
+                self._addr_valid_lbl.setText('✗')
+                self._addr_valid_lbl.setStyleSheet(f'color: {G["red"]}; font-size: 14px;')
+            self._addr_valid_lbl.show()
+        except (BTQRPCError, ConnectionError):
+            self._addr_valid_lbl.hide()
+
+    # ──────────────────────────── Feature: Balance history chart ─────────
+
+    def _draw_balance_chart(self, history: list):
+        if not hasattr(self, '_balance_chart_lbl'):
+            return
+        width, height = 400, 80
+        pm = QPixmap(width, height)
+        pm.fill(QColor(G['surface2']))
+        if len(history) < 2:
+            self._balance_chart_lbl.setPixmap(pm)
+            return
+
+        painter = QPainter(pm)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        min_val = min(history)
+        max_val = max(history)
+        val_range = max_val - min_val if max_val != min_val else 1.0
+
+        pad = 6
+        w = width - pad * 2
+        h = height - pad * 2
+        n = len(history)
+
+        def _x(i):
+            return pad + int(i * w / (n - 1))
+
+        def _y(v):
+            return pad + int((1.0 - (v - min_val) / val_range) * h)
+
+        pen = QPen(QColor(G['green']), 2)
+        pen.setCapStyle(Qt.RoundCap)
+        pen.setJoinStyle(Qt.RoundJoin)
+        painter.setPen(pen)
+
+        for i in range(n - 1):
+            painter.drawLine(_x(i), _y(history[i]), _x(i + 1), _y(history[i + 1]))
+
+        painter.end()
+        self._balance_chart_lbl.setPixmap(pm)
 
     # ──────────────────────────── Tor ─────────────────────────────────────
 
@@ -3578,53 +3991,15 @@ class WalletGUI(QMainWindow):
 
 
     def _create_desktop_shortcut(self):
-        import tempfile
-        desktop = os.path.join(os.path.expanduser('~'), 'Desktop')
-        lnk_path = os.path.join(desktop, 'BTQ Wallet.lnk')
-        if os.path.exists(lnk_path):
-            return
         _dir = os.path.dirname(os.path.abspath(__file__))
-        icon_path = os.path.join(_dir, 'btq_wallet.ico')
-        if not os.path.isfile(icon_path):
-            icon_path = sys.executable
-        if getattr(sys, 'frozen', False):
-            # PyInstaller binary — target is the .exe itself
-            target = sys.executable
-            args = ''
-        else:
-            target = sys.executable
-            args = os.path.abspath(__file__)
-        # VBScript — reliable from pythonw.exe (no console required)
-        def dq(s): return s.replace('"', '""')
-        vbs = (
-            'Set sh = WScript.CreateObject("WScript.Shell")\n'
-            f'Set lnk = sh.CreateShortcut("{dq(lnk_path)}")\n'
-            f'lnk.TargetPath = "{dq(target)}"\n'
-            f'lnk.Arguments = Chr(34) & "{dq(args)}" & Chr(34)\n'
-            f'lnk.WorkingDirectory = "{dq(_dir)}"\n'
-            f'lnk.IconLocation = "{dq(icon_path)}"\n'
-            'lnk.Description = "BTQ Wallet - Post-Quantum Bitcoin"\n'
-            'lnk.Save\n'
+        # Delegate to platform_utils; settings persistence is handled there
+        create_shortcut(
+            script_path=os.path.abspath(__file__),
+            python_path=sys.executable,
+            icon_path=os.path.join(_dir, 'btq_wallet.png'),
+            settings=self._app_settings,
+            save_settings_fn=_save_app_settings,
         )
-        tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.vbs',
-                                          delete=False, encoding='utf-8')
-        tmp.write(vbs)
-        tmp.close()
-        try:
-            wscript = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
-                                   'System32', 'wscript.exe')
-            subprocess.run(
-                [wscript, '//nologo', tmp.name],
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                timeout=15
-            )
-        finally:
-            try:
-                os.unlink(tmp.name)
-            except OSError:
-                pass
 
     def _setup_tray(self):
         if not QSystemTrayIcon.isSystemTrayAvailable():
@@ -3862,6 +4237,11 @@ class WalletGUI(QMainWindow):
                 self._fee_custom_spin.show()
             else:
                 self._fee_custom_spin.hide()
+        if hasattr(self, '_fee_rate_lbl'):
+            if is_custom:
+                self._fee_rate_lbl.show()
+            else:
+                self._fee_rate_lbl.hide()
         self._update_fee_estimate()
 
     def _update_fee_estimate(self):
@@ -4154,64 +4534,18 @@ class WalletGUI(QMainWindow):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _create_shortcut_if_needed():
-    """Create desktop shortcut on first run (Windows only)."""
-    _dbg = os.path.join(os.path.dirname(os.path.abspath(__file__)), '_sc_debug.txt')
-    try:
-        with open(_dbg, 'w', encoding='utf-8') as _f:
-            _f.write(f"called, _IS_WIN={_IS_WIN}, __file__={__file__}\n")
-    except Exception:
-        pass
-    if not _IS_WIN:
-        return
+    """Create desktop shortcut on first run (Windows and Linux)."""
     settings = _load_app_settings()
     if settings.get('shortcut_created'):
         return
-    import tempfile
-    desktop = os.path.join(os.path.expanduser('~'), 'Desktop')
-    lnk_path = os.path.join(desktop, 'BTQ Wallet.lnk')
-    if os.path.exists(lnk_path):
-        settings['shortcut_created'] = True
-        _save_app_settings(settings)
-        return
     _dir = os.path.dirname(os.path.abspath(__file__))
-    icon_path = os.path.join(_dir, 'btq_wallet.ico')
-    if not os.path.isfile(icon_path):
-        icon_path = sys.executable
-    if getattr(sys, 'frozen', False):
-        target = sys.executable
-        args = ''
-    else:
-        target = sys.executable
-        args = os.path.abspath(__file__)
-    def dq(s): return s.replace('"', '""')
-    vbs = (
-        'Set sh = WScript.CreateObject("WScript.Shell")\n'
-        f'Set lnk = sh.CreateShortcut("{dq(lnk_path)}")\n'
-        f'lnk.TargetPath = "{dq(target)}"\n'
-        f'lnk.Arguments = Chr(34) & "{dq(args)}" & Chr(34)\n'
-        f'lnk.WorkingDirectory = "{dq(_dir)}"\n'
-        f'lnk.IconLocation = "{dq(icon_path)}"\n'
-        'lnk.Description = "BTQ Wallet - Post-Quantum Bitcoin"\n'
-        'lnk.Save\n'
+    create_shortcut(
+        script_path=os.path.abspath(__file__),
+        python_path=sys.executable,
+        icon_path=os.path.join(_dir, 'btq_wallet.png'),
+        settings=settings,
+        save_settings_fn=_save_app_settings,
     )
-    try:
-        tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.vbs',
-                                          delete=False, encoding='utf-8')
-        tmp.write(vbs)
-        tmp.close()
-        wscript = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
-                               'System32', 'wscript.exe')
-        subprocess.run([wscript, '//nologo', tmp.name],
-                       stdin=subprocess.DEVNULL,
-                       stdout=subprocess.DEVNULL,
-                       stderr=subprocess.DEVNULL,
-                       timeout=15)
-        os.unlink(tmp.name)
-        if os.path.exists(lnk_path):
-            settings['shortcut_created'] = True
-            _save_app_settings(settings)
-    except Exception:
-        pass
 
 
 def main():

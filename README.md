@@ -32,13 +32,22 @@ curl -fsSL https://github.com/adrianrozadagarcia/BTQ-Wallet/releases/latest/down
 
 ### Option B — Run from source
 
+#### First-time install (creates venv, installs deps, adds desktop shortcut)
+
+| Platform | Command |
+|---|---|
+| Windows | Double-click **`install.bat`** |
+| Linux / macOS | `chmod +x install.sh && ./install.sh` |
+
+#### Launch after installing
+
 | Platform | Command |
 |---|---|
 | Windows | Double-click **`launch.bat`** |
-| Linux | `chmod +x launch.sh && ./launch.sh` |
+| Linux | `./launch.sh` |
 | macOS | Double-click **`launch.command`** |
 
-The launcher scripts handle everything: Python version check, virtual environment, dependency install.
+The scripts handle everything: Python version check, virtual environment, dependency install.
 
 ---
 
@@ -55,7 +64,12 @@ This wallet is a lightweight GUI to interact with a local `btqd` node over JSON-
 - Full wallet management — balances, addresses, send & receive
 - Post-quantum address generation (Dilithium signatures)
 - QR code display for receiving funds
-- Transaction history with confirmations
+- **Transaction detail view** — double-click any transaction for full details + Copy TXID
+- **Export transactions to CSV** — one-click export of the full history
+- **Multi-output send** — send to multiple recipients in a single transaction
+- **Balance history chart** — live line chart of balance over time in the Balance tab
+- **Real-time address validation** — ✓ / ✗ indicator while typing the destination address
+- **Backup reminder** — banner alert after 7 days without a backup
 - Network & blockchain stats
 - **Wallet encryption** — `encryptwallet` / `walletpassphrase` / `walletlock` via Settings
 - **Fee selector** — Slow / Normal / Fast / Custom with live BTQ estimate
@@ -81,7 +95,7 @@ The wallet requires a local BTQ node. Download the binary for your platform from
 | Platform | Binary | Config path |
 |---|---|---|
 | Windows | `btqd.exe` | `%APPDATA%\BTQ\btq.conf` |
-| Linux | `btqd` | `~/.btq/btq.conf` |
+| Linux | `btqd` | `~/.config/BTQ/btq.conf` |
 | macOS | `btqd` | `~/Library/Application Support/BTQ/btq.conf` |
 
 Create `btq.conf`:
@@ -100,6 +114,105 @@ rpcallowip=127.0.0.1
 
 > **Windows note:** downloaded executables may be blocked by SmartScreen. The wallet handles this automatically (`Unblock-File`) on first launch.  
 > **Linux note:** if `btqd` was downloaded (not installed via package manager), run `chmod +x btqd` before first use.
+
+---
+
+## Linux Installation (detailed)
+
+### Requirements
+
+| Package | Minimum | Notes |
+|---|---|---|
+| Python | 3.9+ | `python3 --version` to check |
+| python3-venv | any | Needed to create the virtual environment |
+| python3-pip | any | Usually bundled with Python |
+| PyQt5 | 5.15+ | Can be installed via pip **or** the system package manager |
+
+### Step-by-step
+
+**1 — Clone the repository**
+```bash
+git clone https://github.com/adrianrozadagarcia/BTQ-Wallet.git
+cd BTQ-Wallet
+```
+
+**2 — Run the installer**
+```bash
+chmod +x install.sh
+./install.sh
+```
+
+The installer will:
+- Verify Python 3.9+ is available
+- Check that `python3-venv` is installed
+- Create a `.venv` virtual environment
+- Install all Python dependencies (`PyQt5`, `qrcode`, `cryptography`, …)
+- Create a `.desktop` shortcut in `~/.local/share/applications/` (app menu) and `~/Desktop/` (if it exists)
+
+**3 — Launch**
+```bash
+./launch.sh
+```
+
+Or use the desktop shortcut created in step 2.
+
+### Installing system dependencies by distro
+
+If `install.sh` warns that PyQt5 could not be installed via pip, install it through your package manager:
+
+```bash
+# Debian / Ubuntu
+sudo apt install python3 python3-venv python3-pip python3-pyqt5
+
+# Fedora
+sudo dnf install python3 python3-pip python3-qt5
+
+# Arch Linux
+sudo pacman -S python python-pyqt5
+
+# openSUSE
+sudo zypper install python3 python3-Qt5
+```
+
+### Setting up the node on Linux
+
+```bash
+# Download btqd from the BTQ releases page and place it next to the wallet
+chmod +x btqd
+
+# Create the config directory and file
+mkdir -p ~/.config/BTQ
+cat > ~/.config/BTQ/btq.conf << 'EOF'
+testnet=1
+server=1
+rpcuser=youruser
+rpcpassword=yourpassword
+rpcallowip=127.0.0.1
+EOF
+
+# Start the node
+./btqd -conf=$HOME/.config/BTQ/btq.conf
+```
+
+Or use **Settings → BTQ Node → Start Node** inside the wallet — it will auto-detect `btqd` if it is in the same folder or in `~/.local/bin/`.
+
+### Desktop shortcut details
+
+The installer creates two files:
+
+| File | Purpose |
+|---|---|
+| `~/.local/share/applications/btq-wallet.desktop` | GNOME / KDE app menu entry |
+| `~/Desktop/btq-wallet.desktop` | Desktop icon (if `~/Desktop` exists) |
+
+On **GNOME 3.28+** the desktop icon is automatically marked as trusted (no "untrusted launcher" prompt).  
+On **KDE Plasma** the file is trusted by default.
+
+To remove the shortcut manually:
+```bash
+rm ~/.local/share/applications/btq-wallet.desktop ~/Desktop/btq-wallet.desktop
+update-desktop-database ~/.local/share/applications
+```
 
 ---
 

@@ -54,7 +54,7 @@ if [ ! -f ".venv/bin/python" ]; then
     echo " [OK] Virtual environment created."
 fi
 
-VENV_PYTHON=".venv/bin/python"
+VENV_PYTHON="$SCRIPT_DIR/.venv/bin/python"
 
 # ── Install / update dependencies ─────────────────────────────────────────
 echo " Checking dependencies..."
@@ -66,10 +66,13 @@ echo ""
 # ── Launch ─────────────────────────────────────────────────────────────────
 echo " Opening BTQ Wallet..."
 echo ""
-"$VENV_PYTHON" simple_wallet_gui.py
+set +e
+"$VENV_PYTHON" "$SCRIPT_DIR/simple_wallet_gui.py"
 EXIT_CODE=$?
+set -e
 
 if [ $EXIT_CODE -ne 0 ]; then
     echo ""
     echo " [!] Wallet exited with error code $EXIT_CODE."
 fi
+exit $EXIT_CODE
